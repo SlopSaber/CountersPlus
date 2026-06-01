@@ -1,313 +1,133 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="Counters+.csproj.user" Condition="Exists('Counters+.csproj.user')" />
+
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{A5DBF7F3-FE93-4BB1-8023-2DD50DFD3350}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>CountersPlus</RootNamespace>
-    <AssemblyName>Counters+</AssemblyName>
-    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <DebugType>portable</DebugType>
-    <BeatSaberDir>$(ProjectDir)Refs</BeatSaberDir>
-    <BeatSaberReferences>$(BeatSaberDir)</BeatSaberReferences>
-    <ReferencePath>$(SolutionDir)Refs</ReferencePath>
-    <AppOutputBase>$(MSBuildProjectDirectory)\</AppOutputBase>
-    <PathMap>$(AppOutputBase)=X:\$(AssemblyName)\</PathMap>
+    <TargetFramework>net48</TargetFramework>
     <LangVersion>11</LangVersion>
-    <TargetFrameworkProfile />
+    <RootNamespace>CountersPlus</RootNamespace>
+    <EnableFrameworkPathOverride>True</EnableFrameworkPathOverride>
+    <FrameworkPathOverride>$(BeatSaberDir)\Beat Saber_Data\Managed</FrameworkPathOverride>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>
-    </DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition="$(DefineConstants.Contains('CIBuild')) OR '$(NCrunch)' == '1'">
-    <DisableCopyToPlugins>True</DisableCopyToPlugins>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(NCrunch)' == '1'">
-    <DisableCopyToPlugins>True</DisableCopyToPlugins>
-    <DisableZipRelease>True</DisableZipRelease>
-  </PropertyGroup>
+
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.7, Culture=neutral, processorArchitecture=MSIL">
+    <PackageReference Include="BeatSaberModdingTools.Tasks" Version="2.0.0-beta7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Libs\0Harmony.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BeatmapCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BeatmapCore">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatmapCore.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BeatSaber.GameSettings, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BeatSaber.GameSettings">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.GameSettings.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BeatSaber.PerformancePresets, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BeatSaber.PerformancePresets">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.PerformancePresets.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BeatSaber.Settings, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BeatSaber.Settings">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.Settings.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BeatSaber.ViewSystem, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BeatSaber.ViewSystem">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BeatSaber.ViewSystem.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="BGLib.AppFlow, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.AppFlow.dll</HintPath>
-    </Reference>
-    <Reference Include="BGLib.SaveDataCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BGLib.AppFlow">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.SaveDataCore.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
+      <Publicize>True</Publicize>
     </Reference>
-    <Reference Include="BGLib.UnityExtension, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\BGLib.UnityExtension.dll</HintPath>
+    <Reference Include="BGLib.UnityExtension">
+      <Private>False</Private>
     </Reference>
-    <Reference Include="BSML, Version=1.3.2.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BSML">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\BSML.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Colors, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="DataModels">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Colors.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="DataModels, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="GameplayCore">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\DataModels.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="GameplayCore, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\GameplayCore.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Heck, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Heck">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Plugins\Heck.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Hive.Versioning, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Hive.Versioning">
       <Private>False</Private>
       <HintPath>$(BeatSaberDir)\Libs\Hive.Versioning.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="MediaLoader, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\MediaLoader.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Microsoft.CSharp, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Microsoft.CSharp.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Libs\Newtonsoft.Json.dll</HintPath>
-      <SpecificVersion>True</SpecificVersion>
-    </Reference>
-    <Reference Include="SegmentedControl, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\SegmentedControl.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="SemVer, Version=1.2.2.0, Culture=neutral, PublicKeyToken=a89bb7dc6f7a145c, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Libs\SemVer.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="SiraUtil, Version=0.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
-    <Reference Include="Main">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Main.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="HMLib">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMLib.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="HMUI">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\HMUI.dll</HintPath>
       <Private>False</Private>
+      <Publicize>True</Publicize>
     </Reference>
     <Reference Include="IPA.Loader">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\IPA.Loader.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Main">
+      <Private>False</Private>
+      <Publicize>True</Publicize>
+    </Reference>
+    <Reference Include="Microsoft.CSharp">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="netstandard">
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SegmentedControl">
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SiraUtil">
+      <Private>False</Private>
+      <HintPath>$(BeatSaberDir)\Plugins\SiraUtil.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.TextMeshPro">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Unity.TextMeshPro.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="UnityEngine.ImageConversionModule">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.ImageConversionModule.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="UnityEngine.TextRenderingModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.TextRenderingModule.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="UnityEngine.UI">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="UnityEngine.UIElementsModule">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UIElementsModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UIModule">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UnityWebRequestModule, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.UnityWebRequestModule.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
-    <Reference Include="UnityEngine.VRModule">
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\UnityEngine.VRModule.dll</HintPath>
+    <Reference Include="UnityEngine.UnityWebRequestModule">
       <Private>False</Private>
     </Reference>
-    <Reference Include="VRUI, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="VRUI">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\VRUI.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Zenject, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Zenject">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
-    <Reference Include="Zenject-usage, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Zenject-usage">
       <Private>False</Private>
-      <HintPath>$(BeatSaberDir)\Beat Saber_Data\Managed\Zenject-usage.dll</HintPath>
-      <SpecificVersion>False</SpecificVersion>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ConfigModels\ConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\CutConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\FailConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\MultiplayerRankConfigModel.cs" />
-    <Compile Include="ConfigModels\HUDConfigModel.cs" />
-    <Compile Include="ConfigModels\MainConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\MissedConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\NoteConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\NotesLeftConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\PBConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\ProgressConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\ScoreConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\SpeedConfigModel.cs" />
-    <Compile Include="ConfigModels\Counters\SpinometerConfigModel.cs" />
-    <Compile Include="ConfigModels\SettableSettings\CountersPlusSettableSettings.cs" />
-    <Compile Include="ConfigModels\SettableSettings\CountersPlusWrapperSetting.cs" />
-    <Compile Include="Counters\Counter.cs" />
-    <Compile Include="Counters\Custom\BasicCustomCounter.cs" />
-    <Compile Include="Counters\Custom\CanvasCustomCounter.cs" />
-    <Compile Include="Counters\CutCounter.cs" />
-    <Compile Include="Counters\Event Broadcasters\CounterEventBroadcaster.cs" />
-    <Compile Include="Counters\Event Broadcasters\EventBroadcaster.cs" />
-    <Compile Include="Counters\Event Broadcasters\NoteEventBroadcaster.cs" />
-    <Compile Include="Counters\Event Broadcasters\ScoreEventBroadcaster.cs" />
-    <Compile Include="Counters\FailCounter.cs" />
-    <Compile Include="Counters\Interfaces\ICounter.cs" />
-    <Compile Include="Counters\Interfaces\IEventHandler.cs" />
-    <Compile Include="Counters\Interfaces\INoteEventHandler.cs" />
-    <Compile Include="Counters\Interfaces\IScoreEventHandler.cs" />
-    <Compile Include="Counters\MissedCounter.cs" />
-    <Compile Include="Counters\MultiplayerRankCounter.cs" />
-    <Compile Include="Counters\Note Count Processors\CustomJSONDataNoteCountProcessor.cs" />
-    <Compile Include="Counters\Note Count Processors\GenericNoteCountProcessor.cs" />
-    <Compile Include="Counters\Note Count Processors\NoteCountProcessor.cs" />
-    <Compile Include="Counters\NotesCounter.cs" />
-    <Compile Include="Counters\NotesLeftCounter.cs" />
-    <Compile Include="Counters\PBCounter.cs" />
-    <Compile Include="Counters\ProgressBaseGameCounter.cs" />
-    <Compile Include="Counters\ProgressCounter.cs" />
-    <Compile Include="Counters\ScoreCounter.cs" />
-    <Compile Include="Counters\SpeedCounter.cs" />
-    <Compile Include="Counters\Spinometer.cs" />
-    <Compile Include="Custom\CustomConfigModel.cs" />
-    <Compile Include="Custom\CustomCounter.cs" />
-    <Compile Include="Custom\CustomCounterFeature.cs" />
-    <Compile Include="Harmony\CoreGameHUDControllerPatch.cs" />
-    <Compile Include="Installers\CoreInstaller.cs" />
-    <Compile Include="Installers\CountersInstaller.cs" />
-    <Compile Include="Installers\MenuUIInstaller.cs" />
-    <Compile Include="Installers\MultiplayerCountersInstaller.cs" />
-    <Compile Include="Multiplayer\CanvasIntroFadeController.cs" />
-    <Compile Include="Plugin.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\CountersPlusListTableCell.cs" />
-    <Compile Include="UI\FlowCoordinators\CountersPlusSettingsFlowCoordinator.cs" />
-    <Compile Include="UI\MenuButtonManager.cs" />
-    <Compile Include="UI\MockCounter.cs" />
-    <Compile Include="UI\SettingGroups\CountersSettingsGroup.cs" />
-    <Compile Include="UI\SettingGroups\HUDsSettingsGroup.cs" />
-    <Compile Include="UI\SettingGroups\MainSettingsGroup.cs" />
-    <Compile Include="UI\SettingGroups\SettingsGroup.cs" />
-    <Compile Include="UI\ViewControllers\CountersPlusBlankViewController.cs" />
-    <Compile Include="UI\ViewControllers\CountersPlusCreditsViewController.cs" />
-    <Compile Include="UI\ViewControllers\CountersPlusMainScreenNavigationController.cs" />
-    <Compile Include="UI\ViewControllers\CountersPlusSettingSectionSelectionViewController.cs" />
-    <Compile Include="UI\ViewControllers\Editing\CountersPlusCounterEditViewController.cs" />
-    <Compile Include="UI\ViewControllers\Editing\CountersPlusHUDEditViewController.cs" />
-    <Compile Include="UI\ViewControllers\Editing\CountersPlusMainSettingsEditViewController.cs" />
-    <Compile Include="UI\ViewControllers\CountersPlusHUDListViewController.cs" />
-    <Compile Include="Utils\Accessors.cs" />
-    <Compile Include="Utils\AprilFools.cs" />
-    <Compile Include="Utils\CanvasUtility.cs" />
-    <Compile Include="Utils\EnumerableExtensions.cs" />
-    <Compile Include="Utils\ImagesUtility.cs" />
-    <Compile Include="Utils\SharedCoroutineStarter.cs" />
-    <Compile Include="Utils\SoftParent.cs" />
-    <Compile Include="Utils\VersionUtility.cs" />
-  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="manifest.json" />
     <EmbeddedResource Include="UI\Images\MainSettings.png" />
@@ -331,6 +151,7 @@
     <EmbeddedResource Include="UI\Images\HUDs\Manage.png" />
     <EmbeddedResource Include="UI\Images\HUDs\Remove.png" />
   </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="UI\BSML\EditBase.bsml" />
     <EmbeddedResource Include="UI\BSML\SettingsBase.bsml" />
@@ -346,9 +167,8 @@
     <EmbeddedResource Include="UI\BSML\Config\Fail.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Error.bsml" />
   </ItemGroup>
+
   <ItemGroup>
-    <None Include="BuildTargets.targets" />
-    <None Include=".gitignore" />
     <EmbeddedResource Include="UI\BSML\Credits.bsml" />
     <EmbeddedResource Include="UI\BSML\SettingsSectionSelection.bsml" />
     <EmbeddedResource Include="UI\BSML\BlankScreen.bsml" />
@@ -357,16 +177,9 @@
     <EmbeddedResource Include="UI\BSML\HUDs\HUDEdit.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Multiplayer Rank.bsml" />
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
-  </ItemGroup>
+
   <ItemGroup>
     <EmbeddedResource Include="UI\Images\Counters\Multiplayer Rank.png" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <Import Project="BuildTargets.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>
-    </PostBuildEvent>
-  </PropertyGroup>
+
 </Project>

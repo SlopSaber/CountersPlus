@@ -2,7 +2,6 @@
 using TMPro;
 using UnityEngine;
 using Zenject;
-using static CountersPlus.Utils.Accessors;
 
 namespace CountersPlus.Counters
 {
@@ -26,16 +25,15 @@ namespace CountersPlus.Counters
             // I need to give 'em a friend or else they get shy and hide away in the void.
             _ = CanvasUtility.CreateTextFromSettings(Settings, null);
 
-            ScoreUIController scoreUIController = coreGameHUD.GetComponentInChildren<ScoreUIController>();
-            TextMeshProUGUI old = ScoreUIText(ref scoreUIController);
-            
-            GameObject baseGameScore = RelativeScoreGO(ref coreGameHUD);
+            TextMeshProUGUI old = coreGameHUD.GetComponentInChildren<ScoreUIController>()._scoreText;
+
+            GameObject baseGameScore = coreGameHUD.relativeScoreGo;
             baseGameScore.SetActive(true);
             relativeScoreText = baseGameScore.GetComponent<TextMeshProUGUI>();
             relativeScoreText.enabled = true;
             relativeScoreText.color = Color.white;
 
-            GameObject baseGameRank = ImmediateRankGO(ref coreGameHUD);
+            GameObject baseGameRank = coreGameHUD.immediateRankGo;
             baseGameRank.SetActive(true);
             rankText = baseGameRank.GetComponent<TextMeshProUGUI>();
             rankText.enabled = true;

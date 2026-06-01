@@ -22,30 +22,42 @@ namespace CountersPlus.Utils
 
         private IEnumerator GetBeatModsVersion()
         {
-            using (UnityWebRequest www = UnityWebRequest.Get("https://beatmods.com/api/v1/mod?search=Counters%2B"))
+            using (UnityWebRequest www = UnityWebRequest.Get("https://beatmods.com/api/mods/37"))
             {
+                www.SetRequestHeader("User-Agent", $"Counters+/{PluginVersion}");
                 yield return www.SendWebRequest();
-                if (www.isHttpError || www.isNetworkError)
+                if (www.result != UnityWebRequest.Result.Success)
                 {
                     Plugin.Logger.Error("Failed to download version info.");
                     yield break;
                 }
-                BeatmodsResult[] results = JsonConvert.DeserializeObject<BeatmodsResult[]>(www.downloadHandler.text);
-                foreach (BeatmodsResult result in results)
+                BeatmodsResult result = JsonConvert.DeserializeObject<BeatmodsResult>(www.downloadHandler.text);
+                foreach (BeatmodsModVersionResult versionResult in result.mod.versions)
                 {
-                    if (result.status != "approved") continue;
-                    BeatModsVersion = new Version(result.version);
+                    if (versionResult.status != "verified") continue;
+                    BeatModsVersion = new Version(versionResult.modVersion);
                     break;
                 }
             }
             if (!HasLatestVersion) Plugin.Logger.Warn("Uh oh! We aren't up to date!");
         }
 
-        
+
     }
+
     class BeatmodsResult
     {
+        [JsonProperty("mod")] internal BeatmodsModResult mod;
+    }
+
+    class BeatmodsModResult
+    {
+        [JsonProperty("versions")] internal BeatmodsModVersionResult[] versions;
+    }
+
+    class BeatmodsModVersionResult
+    {
         [JsonProperty("status")] internal string status;
-        [JsonProperty("version")] internal string version;
+        [JsonProperty("modVersion")] internal string modVersion;
     }
 }

@@ -1,13 +1,10 @@
 ﻿using BeatSaberMarkupLanguage;
 using CountersPlus.ConfigModels;
 using HMUI;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using Zenject;
-using static CountersPlus.Utils.Accessors;
 
 namespace CountersPlus.Utils
 {
@@ -41,7 +38,7 @@ namespace CountersPlus.Utils
                 hudHeight = comboPos.y;
                 hudDepth = comboPos.z;
 
-                energyCanvas = EnergyPanelGO(ref coreGameHUD).GetComponent<Canvas>();
+                energyCanvas = coreGameHUD.energyPanelGo.GetComponent<Canvas>();
 
                 // Hide base game elements if needed
                 if (mainConfig.HideCombo) HideBaseGameHUDElement<ComboUIController>(coreGameHUD);
@@ -207,7 +204,7 @@ namespace CountersPlus.Utils
             tmp_text.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 2f);
             tmp_text.enableWordWrapping = false;
             tmp_text.overflowMode = TextOverflowModes.Overflow;
-            
+
             if (mainConfig.ItalicText)
             {
                 tmp_text.fontStyle = FontStyles.Italic;
@@ -240,7 +237,7 @@ namespace CountersPlus.Utils
 
             var canvasSettings = GetCanvasSettingsFromID(settings.CanvasID);
 
-            Vector3 offset = new Vector3(0, -0.75f * (index * canvasSettings.DistanceModifier), 0); // Offset 
+            Vector3 offset = new Vector3(0, -0.75f * (index * canvasSettings.DistanceModifier), 0); // Offset
 
             if (canvasSettings != null)
             {
@@ -277,7 +274,7 @@ namespace CountersPlus.Utils
             }
             return pos + offset + hudHeightOffset;
         }
-        
+
         public void ClearAllText()
         {
             foreach (Canvas canvas in CanvasIDToCanvas.Values)

@@ -3,7 +3,6 @@ using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using CountersPlus.UI.SettingGroups;
 using HMUI;
-using IPA.Utilities;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -29,7 +28,7 @@ namespace CountersPlus.UI.ViewControllers
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
 
-            scrollView = tableList.TableView.GetField<ScrollView, TableView>("_scrollView");
+            scrollView = tableList.TableView.scrollView;
             scrollView.scrollPositionChangedEvent += ScrollView_scrollPositionChangedEvent;
 
             HandleCellSelectedEvent(null, (selectedGroup != null) ? loadedSettingsGroups.IndexOf(selectedGroup) : 0);
@@ -46,13 +45,8 @@ namespace CountersPlus.UI.ViewControllers
 
         private void ScrollView_scrollPositionChangedEvent(float obj)
         {
-            // TODO convert into accessors
-            var destinationPos = scrollView.GetField<float, ScrollView>("_destinationPos");
-            var contentSize = scrollView.GetProperty<float, ScrollView>("contentSize");
-            var scrollPageSize = scrollView.GetProperty<float, ScrollView>("scrollPageSize");
-
-            leftButton.interactable = destinationPos > 0.001f;
-            rightButton.interactable = destinationPos < contentSize - scrollPageSize - 0.001f;
+            leftButton.interactable = scrollView._destinationPos > 0.001f;
+            rightButton.interactable = scrollView._destinationPos < scrollView.contentSize - scrollView.scrollPageSize - 0.001f;
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
@@ -71,7 +65,7 @@ namespace CountersPlus.UI.ViewControllers
         private void HandleCellSelectedEvent(SegmentedControl _, int cellIdx)
         {
             selectedGroup?.OnDisable();
-            
+
             selectedGroup = loadedSettingsGroups[cellIdx];
 
             selectedGroup.OnEnable();

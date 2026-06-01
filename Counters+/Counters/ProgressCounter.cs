@@ -7,7 +7,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
-using static CountersPlus.Utils.Accessors;
 
 namespace CountersPlus.Counters
 {
@@ -49,7 +48,7 @@ namespace CountersPlus.Counters
             };
 
             // I'm sorry, little one.
-            GameObject baseGameProgress = SongProgressPanelGO(ref coreGameHUD);
+            GameObject baseGameProgress = coreGameHUD.songProgressPanelGO;
             UnityEngine.Object.Destroy(baseGameProgress);
 
             if (Settings.Mode != ProgressMode.Percent)

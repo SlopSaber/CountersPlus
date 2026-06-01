@@ -4,7 +4,10 @@ using IPA.Config.Stores.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+
+[assembly: InternalsVisibleTo(IPA.Config.Stores.GeneratedStore.AssemblyVisibilityTarget)]
 
 namespace CountersPlus.ConfigModels
 {
