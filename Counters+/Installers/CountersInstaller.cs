@@ -46,6 +46,8 @@ namespace CountersPlus.Installers
             }
 
             AddCounter<ScoreConfigModel, ScoreCounter>();
+            AddCounter<ComboConfigModel, ComboCounter>();
+            AddCounter<MultiplierConfigModel, MultiplierCounter>();
             AddCounter<CutConfigModel, CutCounter>();
             AddCounter<FailConfigModel, FailCounter>();
             AddCounter<NotesLeftConfigModel, NotesLeftCounter>();

@@ -13,7 +13,7 @@ namespace CountersPlus.ConfigModels
         public override bool Enabled { get; set; } = false;
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.BelowMultiplier;
-        public override int Distance { get; set; } = 2;
+        public override float Distance { get; set; } = 2;
 
         [UIValue(nameof(DecimalPrecision))]
         public virtual int DecimalPrecision { get; set; } = 2;

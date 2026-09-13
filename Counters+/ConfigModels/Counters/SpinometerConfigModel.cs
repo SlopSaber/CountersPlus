@@ -13,7 +13,7 @@ namespace CountersPlus.ConfigModels
         public override bool Enabled { get; set; } = false;
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.AboveMultiplier;
-        public override int Distance { get; set; } = 0;
+        public override float Distance { get; set; } = 0;
 
         [UseConverter]
         public virtual SpinometerMode Mode { get; set; } = SpinometerMode.Highest;

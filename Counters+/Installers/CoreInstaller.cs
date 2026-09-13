@@ -23,6 +23,8 @@ namespace CountersPlus.Installers
             BindConfig(mainConfig.NoteConfig);
             BindConfig(mainConfig.ProgressConfig);
             BindConfig(mainConfig.ScoreConfig);
+            BindConfig(mainConfig.ComboConfig);
+            BindConfig(mainConfig.MultiplierConfig);
             BindConfig(mainConfig.SpeedConfig);
             BindConfig(mainConfig.SpinometerConfig);
             BindConfig(mainConfig.PBConfig);

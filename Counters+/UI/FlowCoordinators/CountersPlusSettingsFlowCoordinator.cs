@@ -61,7 +61,9 @@ namespace CountersPlus.UI.FlowCoordinators
             // Make sure our menu persists through the transition
             gameScenesManager._neverUnloadScenes.Add("MenuCore");
 
-            menuTransitionsHelper._tutorialScenesTransitionSetupData.Init(playerDataModel.playerData.playerSpecificSettings, environmentsListModel, new GameplayAdditionalInformation());
+            menuTransitionsHelper._tutorialScenesTransitionSetupData.Init(
+                playerDataModel.playerData.playerSpecificSettings,
+                new GameplayAdditionalInformation());
 
             menuEnvironmentManager.ShowEnvironmentType(MenuEnvironmentManager.MenuEnvironmentType.None);
 

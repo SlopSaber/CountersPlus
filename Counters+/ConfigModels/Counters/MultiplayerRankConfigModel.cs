@@ -13,6 +13,6 @@ namespace CountersPlus.ConfigModels
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.AboveHighway;
         
-        public override int Distance { get; set; } = 0;
+        public override float Distance { get; set; } = 0;
     }
 }

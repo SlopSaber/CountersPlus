@@ -51,6 +51,7 @@ namespace CountersPlus.UI.ViewControllers.Editing
             model.GetCanvasFromID = (v) => canvasUtility.GetCanvasSettingsFromID(v);
             model.GetCanvasIDFromCanvasSettings = (v) => mainConfig.HUDConfig.OtherCanvasSettings.IndexOf(v);
             model.GetAllCanvases = () => GetAllCanvases();
+            model.OnConfigChanged = () => mockCounter.UpdateMockCounter(model);
 
             if (cachedSettings.TryGetValue(model, out var cache))
             {

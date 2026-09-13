@@ -12,7 +12,7 @@ namespace CountersPlus.Custom
         [JsonProperty(nameof(Position), Required = Required.DisallowNull)]
         public override CounterPositions Position { get; set; } = CounterPositions.BelowCombo;
         [JsonProperty(nameof(Distance), Required = Required.DisallowNull)]
-        public override int Distance { get; set; } = 0;
+        public override float Distance { get; set; } = 0;
 
         [Ignore]
         internal CustomCounter AttachedCustomCounter;

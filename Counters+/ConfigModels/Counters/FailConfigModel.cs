@@ -11,7 +11,7 @@ namespace CountersPlus.ConfigModels
         public override bool Enabled { get; set; } = false;
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.AboveCombo;
-        public override int Distance { get; set; } = 0;
+        public override float Distance { get; set; } = 0;
 
         [UIValue(nameof(ShowRestartsInstead))]
         public virtual bool ShowRestartsInstead { get; set; } = false;

@@ -133,7 +133,9 @@
     <EmbeddedResource Include="UI\Images\MainSettings.png" />
     <EmbeddedResource Include="UI\Images\Counters\Missed.png" />
     <EmbeddedResource Include="UI\Images\Counters\Notes.png" />
+    <EmbeddedResource Include="UI\Images\Counters\Combo.png" />
     <EmbeddedResource Include="UI\Images\Counters\Score.png" />
+    <EmbeddedResource Include="UI\Images\Counters\Multiplier.png" />
     <EmbeddedResource Include="UI\Images\Counters\Progress.png" />
     <EmbeddedResource Include="UI\Images\Counters\Speed.png" />
     <EmbeddedResource Include="UI\Images\Counters\Cut.png" />
@@ -157,8 +159,10 @@
     <EmbeddedResource Include="UI\BSML\SettingsBase.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Missed.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Notes.bsml" />
+    <EmbeddedResource Include="UI\BSML\Config\Combo.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Progress.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Score.bsml" />
+    <EmbeddedResource Include="UI\BSML\Config\Multiplier.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Personal Best.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Speed.bsml" />
     <EmbeddedResource Include="UI\BSML\Config\Spinometer.bsml" />

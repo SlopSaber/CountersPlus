@@ -7,8 +7,8 @@
     <text align='Center' text='This custom counter is not marked as Multiplayer ready, and will not load in Multiplayer.'/>
   </vertical>
 
-  <checkbox-setting text='Enabled' apply-on-change='true' value='Enabled' hover-hint='Toggle this counter on or off.'/>
-  <dropdown-list-setting text='Position' apply-on-change='true' value='Position' options='Positions' formatter='PositionsFormat' hover-hint='The relative position of common UI elements.'/>
-  <list-setting text='Distance' apply-on-change='true' value='Distance' options='Distances' hover-hint='How far from the position the counter will be. A higher number means farther away.'/>
-  <dropdown-list-setting text='Canvas' apply-on-change='true' value='AttachedCanvas' options='AllCanvases' formatter='CanvasesFormat' hover-hint='The Canvas this counter is attached to.'/>
+  <checkbox-setting text='Enabled' apply-on-change='true' value='Enabled' hover-hint='Toggle this counter on or off.' on-change='fire-update'/>
+  <dropdown-list-setting text='Position' apply-on-change='true' value='Position' options='Positions' formatter='PositionsFormat' hover-hint='The relative position of common UI elements.' on-change='fire-update'/>
+  <list-setting text='Distance' apply-on-change='true' value='Distance' options='Distances' hover-hint='How far from the position the counter will be. A higher number means farther away.' on-change='fire-update'/>
+  <dropdown-list-setting text='Canvas' apply-on-change='true' value='AttachedCanvas' options='AllCanvases' formatter='CanvasesFormat' hover-hint='The Canvas this counter is attached to.' on-change='fire-update'/>
 </vertical>

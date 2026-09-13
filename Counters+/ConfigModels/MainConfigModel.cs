@@ -39,6 +39,8 @@ namespace CountersPlus.ConfigModels
         public virtual NoteConfigModel NoteConfig { get; set; } = new NoteConfigModel();
         public virtual ProgressConfigModel ProgressConfig { get; set; } = new ProgressConfigModel();
         public virtual ScoreConfigModel ScoreConfig { get; set; } = new ScoreConfigModel();
+        public virtual ComboConfigModel ComboConfig { get; set; } = new ComboConfigModel();
+        public virtual MultiplierConfigModel MultiplierConfig { get; set; } = new MultiplierConfigModel();
         public virtual PBConfigModel PBConfig { get; set; } = new PBConfigModel();
         public virtual SpeedConfigModel SpeedConfig { get; set; } = new SpeedConfigModel();
         public virtual CutConfigModel CutConfig { get; set; } = new CutConfigModel();

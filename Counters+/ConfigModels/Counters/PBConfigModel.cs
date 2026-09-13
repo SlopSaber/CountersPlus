@@ -14,7 +14,7 @@ namespace CountersPlus.ConfigModels
         public override bool Enabled { get; set; } = true;
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.BelowMultiplier;
-        public override int Distance { get; set; } = 1;
+        public override float Distance { get; set; } = 1;
 
         [UseConverter]
         [UIValue(nameof(Mode))]

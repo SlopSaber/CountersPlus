@@ -11,7 +11,7 @@ namespace CountersPlus.ConfigModels
         public override bool Enabled { get; set; } = false;
         [UseConverter]
         public override CounterPositions Position { get; set; } = CounterPositions.AboveHighway;
-        public override int Distance { get; set; } = -1;
+        public override float Distance { get; set; } = -1;
 
         [UIValue(nameof(LabelAboveCount))]
         public virtual bool LabelAboveCount { get; set; } = false;

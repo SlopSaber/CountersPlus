@@ -226,7 +226,7 @@ namespace CountersPlus.Utils
             float comboOffset = mainConfig.ComboOffset;
             float multOffset = mainConfig.MultiplierOffset;
             CounterPositions position = settings.Position;
-            int index = settings.Distance;
+            float index = settings.Distance;
             var pos = new Vector3(); // Base position
             var hudHeightOffset = new Vector3();
 

@@ -24,7 +24,7 @@ namespace CountersPlus.ConfigModels
         public virtual CounterPositions Position { get; set; } = CounterPositions.BelowCombo;
         
         [UIValue(nameof(Distance))]
-        public virtual int Distance { get; set; } = 2;
+        public virtual float Distance { get; set; } = 2;
 
         // Default Canvas will be the main Counters+ one
         // Oh yeah baby, we're gonna support multiple canvases
@@ -41,7 +41,7 @@ namespace CountersPlus.ConfigModels
         [UIAction(nameof(PositionsFormat))]
         public string PositionsFormat(CounterPositions pos) => PositionToNames[pos];
 
-        private static List<int> AllDistances = new List<int>() { -1, 0, 1, 2, 3, 4 };
+        private static List<float> AllDistances = Enumerable.Range(-40, 81).Select(x => x * 0.25f).ToList();
 
         private static Dictionary<CounterPositions, string> PositionToNames = new Dictionary<CounterPositions, string>()
         {
@@ -61,6 +61,13 @@ namespace CountersPlus.ConfigModels
         [Ignore] public Func<int, HUDCanvas> GetCanvasFromID;
         [Ignore] public Func<HUDCanvas, int> GetCanvasIDFromCanvasSettings;
         [Ignore] public Func<List<HUDCanvas>> GetAllCanvases;
+        [Ignore] public Action OnConfigChanged;
+
+        [UIAction("fire-update")]
+        public void OnChanged(object _)
+        {
+            OnConfigChanged?.Invoke();
+        }
 
         [UIValue(nameof(AttachedCanvas))]
         [Ignore]
