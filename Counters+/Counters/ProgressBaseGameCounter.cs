@@ -8,7 +8,7 @@ namespace CountersPlus.Counters
     {
         private readonly Vector3 offset = new Vector3(0, -0.25f, 0);
 
-        [Inject] private CoreGameHUDController coreGameHUDController;
+        [Inject] private CoreGameHUDController coreGameHUDController { get; set; }
 
         public override void CounterInit()
         {

@@ -12,7 +12,7 @@ namespace CountersPlus.UI
     {
         private Dictionary<ConfigModel, TMP_Text> activeMockCounters = new Dictionary<ConfigModel, TMP_Text>();
 
-        [Inject] private CanvasUtility canvasUtility;
+        [Inject] private CanvasUtility canvasUtility { get; set; }
 
         private ConfigModel highlightedConfig = null;
 

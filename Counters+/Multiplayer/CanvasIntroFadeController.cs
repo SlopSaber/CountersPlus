@@ -9,11 +9,11 @@ namespace CountersPlus.Multiplayer
 {
     internal class CanvasIntroFadeController : IInitializable, ITickable, IDisposable
     {
-        [Inject] private CoreGameHUDController coreGameHUDController;
-        [Inject] private HUDConfigModel hudConfig;
-        [Inject] private CanvasUtility canvasUtility;
+        [Inject] private CoreGameHUDController coreGameHUDController { get; set; }
+        [Inject] private HUDConfigModel hudConfig { get; set; }
+        [Inject] private CanvasUtility canvasUtility { get; set; }
         
-        [Inject] private MultiplayerController multiplayerController;
+        [Inject] private MultiplayerController multiplayerController { get; set; }
 
         private CanvasGroup coreGameHUDCanvasGroup;
         private List<CanvasGroup> countersPlusCanvasGroups = new List<CanvasGroup>();

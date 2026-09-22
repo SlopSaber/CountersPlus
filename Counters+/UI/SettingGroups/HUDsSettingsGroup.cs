@@ -8,8 +8,8 @@ namespace CountersPlus.UI.SettingGroups
 {
     public class HUDsSettingsGroup : SettingsGroup
     {
-        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator;
-        [Inject] private LazyInject<CountersPlusHUDListViewController> hudList;
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
+        [Inject] private LazyInject<CountersPlusHUDListViewController> hudList { get; set; }
 
         public override void OnEnable()
         {

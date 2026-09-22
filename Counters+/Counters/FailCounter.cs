@@ -13,10 +13,10 @@ namespace CountersPlus.Counters
         private static long difficulty = 0;
         private static int restarts = 0;
 
-        [Inject] private GameEnergyCounter energyCounter;
-        [Inject] private PlayerDataModel playerData;
-        [Inject] private BeatmapLevel beatmap;
-        [Inject] private BeatmapKey beatmapKey;
+        [Inject] private GameEnergyCounter energyCounter { get; set; }
+        [Inject] private PlayerDataModel playerData { get; set; }
+        [Inject] private BeatmapLevel beatmap { get; set; }
+        [Inject] private BeatmapKey beatmapKey { get; set; }
         private int count = 0;
         private TMP_Text counter;
 

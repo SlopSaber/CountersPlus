@@ -10,7 +10,7 @@ namespace CountersPlus.Counters
 {
     internal class Spinometer : Counter<SpinometerConfigModel>, ITickable
     {
-        [Inject] private SaberManager saberManager;
+        [Inject] private SaberManager saberManager { get; set; }
 
         private Saber leftSaber = null;
         private Saber rightSaber = null;

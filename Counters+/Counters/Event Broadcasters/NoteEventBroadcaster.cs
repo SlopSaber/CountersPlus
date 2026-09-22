@@ -8,7 +8,7 @@ namespace CountersPlus.Counters.Event_Broadcasters
     /// </summary>
     internal class NoteEventBroadcaster : EventBroadcaster<INoteEventHandler>
     {
-        [Inject] private BeatmapObjectManager beatmapObjectManager;
+        [Inject] private BeatmapObjectManager beatmapObjectManager { get; set; }
 
         public override void Initialize()
         {

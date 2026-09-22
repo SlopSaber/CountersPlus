@@ -15,9 +15,9 @@ namespace CountersPlus.Counters
         private readonly Vector3 ringSize = Vector3.one * 1.175f;
         private readonly string multiplierImageSpriteName = "Circle";
 
-        [Inject] private AudioTimeSyncController atsc;
-        [Inject] private CoreGameHUDController coreGameHUD; // For getting multiplier image
-        [Inject] private GameplayCoreSceneSetupData gcssd; // I hope this works
+        [Inject] private AudioTimeSyncController atsc { get; set; }
+        [Inject] private CoreGameHUDController coreGameHUD { get; set; } // For getting multiplier image
+        [Inject] private GameplayCoreSceneSetupData gcssd { get; set; } // I hope this works
 
         private TMP_Text timeText;
         private ImageView progressRing;
@@ -44,7 +44,7 @@ namespace CountersPlus.Counters
                 ProgressMode.TimeInBeats when !Settings.ProgressTimeLeft => "0.00",
 
                 _ when Settings.ProgressTimeLeft => $"{atsc.songLength:F2}",
-                _ when !Settings.ProgressTimeLeft => "0:00"
+                _ => "0:00"
             };
 
             // I'm sorry, little one.

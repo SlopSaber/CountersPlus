@@ -23,9 +23,9 @@ namespace CountersPlus.Utils
                 {
                     if (_instance == null)
                     {
-                        _instance = FindObjectOfType<SharedCoroutineStarter>();
+                        _instance = FindFirstObjectByType<SharedCoroutineStarter>();
 
-                        if (FindObjectsOfType<SharedCoroutineStarter>().Length > 1)
+                        if (FindObjectsByType<SharedCoroutineStarter>(FindObjectsSortMode.InstanceID).Length > 1)
                         {
                             Debug.LogError("[Singleton] Something went really wrong - there should never be more than 1 singleton! Reopening the scene might fix it.");
                             return _instance;

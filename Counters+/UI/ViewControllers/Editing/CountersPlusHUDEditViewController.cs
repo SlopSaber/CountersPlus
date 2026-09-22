@@ -16,11 +16,11 @@ namespace CountersPlus.UI.ViewControllers.Editing
     {
         private readonly string SettingsBase = Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "CountersPlus.UI.BSML.HUDs.HUDEdit.bsml");
 
-        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator;
-        [Inject] private LazyInject<CountersPlusHUDListViewController> hudList;
-        [Inject] private CanvasUtility canvasUtility;
-        [Inject] private MainConfigModel mainConfig;
-        [Inject] private HUDConfigModel hudConfig;
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
+        [Inject] private LazyInject<CountersPlusHUDListViewController> hudList { get; set; }
+        [Inject] private CanvasUtility canvasUtility { get; set; }
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private HUDConfigModel hudConfig { get; set; }
 
         private int canvasID = -1;
         private HUDCanvas currentlyEditing = null;

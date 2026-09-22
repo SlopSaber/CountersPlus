@@ -7,7 +7,7 @@ namespace CountersPlus.UI.ViewControllers
 {
     public class CountersPlusBlankViewController : BSMLResourceViewController
     {
-        [UIObject("easter-egg")] private GameObject hidden;
+        [UIObject("easter-egg")] private GameObject hidden { get; set; }
 
         private CanvasGroup group;
 

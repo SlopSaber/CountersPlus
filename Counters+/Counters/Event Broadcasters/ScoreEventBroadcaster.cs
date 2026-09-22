@@ -8,7 +8,7 @@ namespace CountersPlus.Counters.Event_Broadcasters
     /// </summary>
     internal class ScoreEventBroadcaster : EventBroadcaster<IScoreEventHandler>
     {
-        [Inject] private ScoreController scoreController;
+        [Inject] private ScoreController scoreController { get; set; }
 
         public override void Initialize()
         {

@@ -20,14 +20,14 @@ namespace CountersPlus.UI.ViewControllers.Editing
 
         private readonly string SettingsBase = Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "CountersPlus.UI.BSML.SettingsBase.bsml");
 
-        [Inject] private MainConfigModel mainConfig;
-        [Inject] private MockCounter mockCounter;
-        [Inject] private CanvasUtility canvasUtility;
-        [Inject] private DiContainer diContainer;
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private MockCounter mockCounter { get; set; }
+        [Inject] private CanvasUtility canvasUtility { get; set; }
+        [Inject] private DiContainer diContainer { get; set; }
 
-        [UIObject("body")] private GameObject settingsContainer;
-        [UIComponent("ScrollContent")] private BSMLScrollableContainer scrollView;
-        [UIComponent("name")] private TextMeshProUGUI settingsHeader;
+        [UIObject("body")] private GameObject settingsContainer { get; set; }
+        [UIComponent("ScrollContent")] private BSMLScrollableContainer scrollView { get; set; }
+        [UIComponent("name")] private TextMeshProUGUI settingsHeader { get; set; }
 
         private Dictionary<ConfigModel, HashSet<GameObject>> cachedSettings = new Dictionary<ConfigModel, HashSet<GameObject>>();
 

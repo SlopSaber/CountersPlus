@@ -10,8 +10,8 @@ namespace CountersPlus.Counters
     {
         private readonly Vector3 offset = new Vector3(0, -0.25f, 0);
 
-        [Inject] private MainConfigModel mainConfig;
-        [Inject] private MultiplayerPositionHUDController multiplayerPositionHUDController;
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private MultiplayerPositionHUDController multiplayerPositionHUDController { get; set; }
 
         public override void CounterInit()
         {

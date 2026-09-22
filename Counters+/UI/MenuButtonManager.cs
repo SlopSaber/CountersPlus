@@ -11,8 +11,8 @@ namespace CountersPlus.UI
     internal class MenuButtonManager : IInitializable, IDisposable
     {
         private MenuButton menuButton;
-        [Inject] private MainFlowCoordinator mainFlowCoordinator;
-        [Inject] private CountersPlusSettingsFlowCoordinator flowCoordinator;
+        [Inject] private MainFlowCoordinator mainFlowCoordinator { get; set; }
+        [Inject] private CountersPlusSettingsFlowCoordinator flowCoordinator { get; set; }
 
         public void Initialize()
         {

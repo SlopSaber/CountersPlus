@@ -10,9 +10,9 @@ namespace CountersPlus.Counters
     {
         private readonly Vector3 offset = new Vector3(0, 1.91666f, 0);
 
-        [Inject] private CoreGameHUDController coreGameHUD;
-        [Inject] private RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRank;
-        [Inject] private MainConfigModel mainConfig;
+        [Inject] private CoreGameHUDController coreGameHUD { get; set; }
+        [Inject] private RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRank { get; set; }
+        [Inject] private MainConfigModel mainConfig { get; set; }
 
         private RankModel.Rank prevImmediateRank = RankModel.Rank.SSS;
         private TextMeshProUGUI rankText;

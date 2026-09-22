@@ -11,7 +11,7 @@ namespace CountersPlus.UI.ViewControllers
 {
     class CountersPlusCreditsViewController : BSMLResourceViewController
     {
-        [Inject] private VersionUtility versionUtility;
+        [Inject] private VersionUtility versionUtility { get; set; }
 
         public override string ResourceName => "CountersPlus.UI.BSML.Credits.bsml";
 

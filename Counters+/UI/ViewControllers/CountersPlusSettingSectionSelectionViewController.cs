@@ -14,9 +14,9 @@ namespace CountersPlus.UI.ViewControllers
     {
         [Inject] private List<SettingsGroup> loadedSettingsGroups = new List<SettingsGroup>();
 
-        [UIComponent("list")] private CustomCellListTableData tableList;
-        [UIComponent("left-button")] private Button leftButton;
-        [UIComponent("right-button")] private Button rightButton;
+        [UIComponent("list")] private CustomCellListTableData tableList { get; set; }
+        [UIComponent("left-button")] private Button leftButton { get; set; }
+        [UIComponent("right-button")] private Button rightButton { get; set; }
 
         private ScrollView scrollView;
 

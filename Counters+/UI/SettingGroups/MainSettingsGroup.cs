@@ -7,8 +7,8 @@ namespace CountersPlus.UI.SettingGroups
 {
     public class MainSettingsGroup : SettingsGroup
     {
-        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator;
-        [Inject] private LazyInject<CountersPlusMainSettingsEditViewController> mainSettings;
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
+        [Inject] private LazyInject<CountersPlusMainSettingsEditViewController> mainSettings { get; set; }
 
         public override void OnEnable() => flowCoordinator.Value.PushToMainScreen(mainSettings.Value);
 

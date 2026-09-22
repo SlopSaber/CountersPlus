@@ -19,7 +19,7 @@ namespace CountersPlus.Counters.NoteCountProcessors
         private List<NoteData> data;
 
 
-        [Inject] private IReadonlyBeatmapData beatmapData;
+        [Inject] private IReadonlyBeatmapData beatmapData { get; set; }
 
         protected List<NoteData> GetNoteData(IReadonlyBeatmapData data)
         {

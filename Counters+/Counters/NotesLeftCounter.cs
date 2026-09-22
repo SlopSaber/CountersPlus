@@ -9,8 +9,8 @@ namespace CountersPlus.Counters
 {
     internal class NotesLeftCounter : Counter<NotesLeftConfigModel>, INoteEventHandler
     {
-        [Inject] private GameplayCoreSceneSetupData setupData;
-        [Inject] private NoteCountProcessor noteCountProcessor;
+        [Inject] private GameplayCoreSceneSetupData setupData { get; set; }
+        [Inject] private NoteCountProcessor noteCountProcessor { get; set; }
 
         private int notesLeft = 0;
         private TMP_Text counter;

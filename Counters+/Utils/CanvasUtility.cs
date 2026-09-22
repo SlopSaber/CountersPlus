@@ -196,13 +196,13 @@ namespace CountersPlus.Utils
                 anchoredPosition += offset.Value;
             }
 
-            TMP_Text tmp_text = BeatSaberUI.CreateText(rectTransform, "", anchoredPosition * posScaleFactor);
+            TMP_Text tmp_text = BeatSaberUI.CreateCurvedUIText(rectTransform, "", new Vector2(0.5f, 0.5f), new Vector2(0.5f, 0.5f), anchoredPosition * posScaleFactor, new Vector2(60, 10));
             tmp_text.gameObject.layer = UILayer;
             tmp_text.alignment = TextAlignmentOptions.Center;
             tmp_text.fontSize = 4f;
             tmp_text.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, 2f);
             tmp_text.rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 2f);
-            tmp_text.enableWordWrapping = false;
+            tmp_text.textWrappingMode = TextWrappingModes.NoWrap;
             tmp_text.overflowMode = TextOverflowModes.Overflow;
 
             if (mainConfig.ItalicText)

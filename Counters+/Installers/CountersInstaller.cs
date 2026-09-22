@@ -14,10 +14,10 @@ namespace CountersPlus.Installers
     class CountersInstaller : MonoInstaller
     {
         [Inject]
-        private readonly HUDConfigModel hudConfig;
+        private HUDConfigModel hudConfig { get; set; }
 
         [Inject]
-        private readonly PlayerDataModel dataModel;
+        private PlayerDataModel dataModel { get; set; }
 
         public override void InstallBindings()
         {

@@ -12,11 +12,11 @@ namespace CountersPlus.Counters
     {
         private readonly Vector3 SCORE_COUNTER_OFFSET = new Vector3(0, -1.85f, 0); 
 
-        [Inject] private GameplayCoreSceneSetupData data;
-        [Inject] private PlayerDataModel playerDataModel;
-        [Inject] private ScoreConfigModel scoreConfig;
-        [Inject] private RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRank;
-        [Inject] private IReadonlyBeatmapData beatmapData;
+        [Inject] private GameplayCoreSceneSetupData data { get; set; }
+        [Inject] private PlayerDataModel playerDataModel { get; set; }
+        [Inject] private ScoreConfigModel scoreConfig { get; set; }
+        [Inject] private RelativeScoreAndImmediateRankCounter relativeScoreAndImmediateRank { get; set; }
+        [Inject] private IReadonlyBeatmapData beatmapData { get; set; }
 
         private TMP_Text counter;
         private PlayerLevelStatsData stats;

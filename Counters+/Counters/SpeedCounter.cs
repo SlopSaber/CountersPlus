@@ -10,7 +10,7 @@ namespace CountersPlus.Counters
 {
     internal class SpeedCounter : Counter<SpeedConfigModel>, ITickable
     {
-        [Inject] private SaberManager saberManager;
+        [Inject] private SaberManager saberManager { get; set; }
 
         private Saber right;
         private Saber left;

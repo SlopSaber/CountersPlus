@@ -22,17 +22,17 @@ namespace CountersPlus.UI.ViewControllers
         public bool IsDeleting = false;
         public int SelectedCanvas { get; private set; } = -1;
 
-        [UIComponent("list")] private CustomListTableData data;
-        [UIComponent("new-canvas-name")] private ModalKeyboard newCanvasKeyboard;
-        [UIComponent("delete-canvas")] private ModalView deleteCanvas;
-        [UIComponent("canvas-error")] private ModalView canvasError;
-        [UIParams] private BSMLParserParams parserParams;
+        [UIComponent("list")] private CustomListTableData data { get; set; }
+        [UIComponent("new-canvas-name")] private ModalKeyboard newCanvasKeyboard { get; set; }
+        [UIComponent("delete-canvas")] private ModalView deleteCanvas { get; set; }
+        [UIComponent("canvas-error")] private ModalView canvasError { get; set; }
+        [UIParams] private BSMLParserParams parserParams { get; set; }
 
-        [Inject] private HUDConfigModel hudConfig;
-        [Inject] private MainConfigModel mainConfig;
-        [Inject] private CanvasUtility canvasUtility;
-        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator;
-        [Inject] private LazyInject<CountersPlusHUDEditViewController> hudEdit;
+        [Inject] private HUDConfigModel hudConfig { get; set; }
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private CanvasUtility canvasUtility { get; set; }
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
+        [Inject] private LazyInject<CountersPlusHUDEditViewController> hudEdit { get; set; }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {

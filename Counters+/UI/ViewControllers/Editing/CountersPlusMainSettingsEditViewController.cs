@@ -11,8 +11,8 @@ namespace CountersPlus.UI.ViewControllers.Editing
     {
         private readonly string SettingsBase = Utilities.GetResourceContent(Assembly.GetExecutingAssembly(), "CountersPlus.UI.BSML.MainSettings.bsml");
 
-        [Inject] private MainConfigModel mainConfig;
-        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator;
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {

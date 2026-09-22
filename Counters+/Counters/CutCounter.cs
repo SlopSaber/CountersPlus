@@ -9,7 +9,7 @@ namespace CountersPlus.Counters
 {
     internal class CutCounter : Counter<CutConfigModel>
     {
-        [Inject] ScoreController scoreController;
+        [Inject] private ScoreController scoreController { get; set; }
 
         private TMP_Text cutCounterLeft;
         private TMP_Text cutCounterRight;

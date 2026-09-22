@@ -1,10 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="Counters+.csproj.user" Condition="Exists('Counters+.csproj.user')" />
 
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>11</LangVersion>
+    <Nullable>annotations</Nullable>
+    <BSMTProjectType>BSIPA</BSMTProjectType>
     <RootNamespace>CountersPlus</RootNamespace>
     <EnableFrameworkPathOverride>True</EnableFrameworkPathOverride>
     <FrameworkPathOverride>$(BeatSaberDir)\Beat Saber_Data\Managed</FrameworkPathOverride>
@@ -35,9 +36,6 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="BeatSaber.GameSettings">
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="BeatSaber.PerformancePresets">
       <Private>False</Private>
     </Reference>
     <Reference Include="BeatSaber.Settings">
@@ -84,9 +82,6 @@
     <Reference Include="Main">
       <Private>False</Private>
       <Publicize>True</Publicize>
-    </Reference>
-    <Reference Include="Microsoft.CSharp">
-      <Private>False</Private>
     </Reference>
     <Reference Include="netstandard">
       <Private>false</Private>

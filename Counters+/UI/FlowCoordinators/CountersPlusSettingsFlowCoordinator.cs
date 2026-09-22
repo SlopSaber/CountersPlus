@@ -18,24 +18,23 @@ namespace CountersPlus.UI.FlowCoordinators
 
 
         [Inject] public List<ConfigModel> AllConfigModels;
-        [Inject] private CanvasUtility canvasUtility;
-        [Inject] private MockCounter mockCounter;
-        [Inject] private MenuTransitionsHelper menuTransitionsHelper;
-        [Inject] private MenuEnvironmentManager menuEnvironmentManager;
-        [Inject] private GameScenesManager gameScenesManager;
-        [Inject] private FadeInOutController fadeInOutController;
-        [Inject] private VRInputModule vrInputModule;
-        [Inject] private MenuShockwave menuShockwave;
-        [Inject] private PlayerDataModel playerDataModel;
-        [Inject] private MainFlowCoordinator mainFlowCoordinator;
-        [Inject] private EnvironmentsListModel environmentsListModel;
+        [Inject] private CanvasUtility canvasUtility { get; set; }
+        [Inject] private MockCounter mockCounter { get; set; }
+        [Inject] private MenuTransitionsHelper menuTransitionsHelper { get; set; }
+        [Inject] private MenuEnvironmentManager menuEnvironmentManager { get; set; }
+        [Inject] private GameScenesManager gameScenesManager { get; set; }
+        [Inject] private FadeInOutController fadeInOutController { get; set; }
+        [Inject] private VRInputModule vrInputModule { get; set; }
+        [Inject] private MenuShockwave menuShockwave { get; set; }
+        [Inject] private PlayerDataModel playerDataModel { get; set; }
+        [Inject] private MainFlowCoordinator mainFlowCoordinator { get; set; }
 
-        [Inject] private CountersPlusCreditsViewController credits;
-        [Inject] private CountersPlusBlankViewController blank;
-        [Inject] private CountersPlusMainScreenNavigationController mainScreenNavigation;
-        [Inject] private CountersPlusSettingSectionSelectionViewController settingsSelection;
-        [Inject] private SettingsManager settingsManager;
-        [Inject] private SongPreviewPlayer songPreviewPlayer;
+        [Inject] private CountersPlusCreditsViewController credits { get; set; }
+        [Inject] private CountersPlusBlankViewController blank { get; set; }
+        [Inject] private CountersPlusMainScreenNavigationController mainScreenNavigation { get; set; }
+        [Inject] private CountersPlusSettingSectionSelectionViewController settingsSelection { get; set; }
+        [Inject] private SettingsManager settingsManager { get; set; }
+        [Inject] private SongPreviewPlayer songPreviewPlayer { get; set; }
 
         private bool hasTransitioned = false;
 

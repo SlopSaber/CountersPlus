@@ -33,7 +33,8 @@ namespace CountersPlus
             MainConfig = conf.Generated<MainConfigModel>();
             harmony = new HarmonyObj(HARMONY_ID);
 
-            zenjector.Expose<CoreGameHUDController>("Environment");
+            zenjector.Expose<CoreGameHUDController>(condition: (context, _) =>
+                context is Zenject.SceneDecoratorContext decorator && decorator.DecoratedContractName == "Environment");
 
             zenjector.Install<CoreInstaller>(Location.App);
             zenjector.Install<MenuUIInstaller>(Location.Menu);
