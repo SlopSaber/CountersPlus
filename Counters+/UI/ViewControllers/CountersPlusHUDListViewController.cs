@@ -26,7 +26,7 @@ namespace CountersPlus.UI.ViewControllers
         [UIComponent("new-canvas-name")] private ModalKeyboard newCanvasKeyboard { get; set; }
         [UIComponent("delete-canvas")] private ModalView deleteCanvas { get; set; }
         [UIComponent("canvas-error")] private ModalView canvasError { get; set; }
-        [UIParams] private BSMLParserParams parserParams { get; set; }
+        [UIParams] private BSMLParserParams parserParams = null;
 
         [Inject] private HUDConfigModel hudConfig { get; set; }
         [Inject] private MainConfigModel mainConfig { get; set; }

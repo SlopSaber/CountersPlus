@@ -11,7 +11,7 @@ namespace CountersPlus.UI
     {
         public int CellIdx { get; private set; } = 0;
 
-        [UIParams] private BSMLParserParams parserParams { get; set; }
+        [UIParams] private BSMLParserParams parserParams = null;
 
         public CountersPlusListTableCell(int idx, string text, string subtext, Sprite icon = null) : base(text, subtext, icon)
         {
