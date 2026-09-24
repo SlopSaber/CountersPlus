@@ -49,6 +49,24 @@ namespace CountersPlus.UI.FlowCoordinators
             ProvideInitialViewControllers(mainScreenNavigation, credits, null, settingsSelection);
 
             RefreshAllMockCounters();
+            LogPreviewState();
+        }
+
+        private void LogPreviewState()
+        {
+            var canvas = canvasUtility.GetCanvasFromID(-1);
+            if (canvas == null)
+            {
+                Plugin.Logger.Warn("Menu preview main canvas is missing after activation.");
+                return;
+            }
+
+            int layerMask = 1 << canvas.gameObject.layer;
+            Plugin.Logger.Notice($"Menu preview canvas: scene={canvas.gameObject.scene.name}, active={canvas.gameObject.activeInHierarchy}, enabled={canvas.enabled}, layer={LayerMask.LayerToName(canvas.gameObject.layer)}, children={canvas.transform.childCount}, position={canvas.transform.position}");
+            foreach (var camera in Camera.allCameras)
+            {
+                Plugin.Logger.Notice($"Menu preview camera: name={camera.name}, active={camera.isActiveAndEnabled}, rendersCanvasLayer={(camera.cullingMask & layerMask) != 0}, cullingMask={camera.cullingMask}");
+            }
         }
 
         public void DoSceneTransition(Action callback = null)
