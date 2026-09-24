@@ -22,20 +22,10 @@ namespace CountersPlus.UI
 
         private void SummonFlowCoordinator()
         {
-            void OpenSettings() => flowCoordinator.DoSceneTransition(() =>
+            flowCoordinator.DoSceneTransition(() =>
             {
                 mainFlowCoordinator.PresentFlowCoordinator(flowCoordinator);
             });
-
-            var activeMenuFlow = mainFlowCoordinator.childFlowCoordinator;
-            if (activeMenuFlow != null)
-            {
-                mainFlowCoordinator.DismissFlowCoordinator(activeMenuFlow, ViewController.AnimationDirection.Horizontal, OpenSettings, true);
-            }
-            else
-            {
-                OpenSettings();
-            }
         }
 
         public void Dispose()
