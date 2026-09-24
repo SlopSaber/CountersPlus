@@ -49,25 +49,6 @@ namespace CountersPlus.UI.FlowCoordinators
             ProvideInitialViewControllers(mainScreenNavigation, credits, null, settingsSelection);
 
             RefreshAllMockCounters();
-            HideMenuLeaderboards();
-        }
-
-        private void HideMenuLeaderboards()
-        {
-            foreach (var leaderboard in Resources.FindObjectsOfTypeAll<PlatformLeaderboardViewController>())
-            {
-                if (leaderboard != null && leaderboard.gameObject.activeInHierarchy)
-                {
-                    if (leaderboard.isActivated)
-                    {
-                        leaderboard.__Deactivate(false, true, false);
-                    }
-                    else
-                    {
-                        leaderboard.gameObject.SetActive(false);
-                    }
-                }
-            }
         }
 
         public void DoSceneTransition(Action callback = null)
