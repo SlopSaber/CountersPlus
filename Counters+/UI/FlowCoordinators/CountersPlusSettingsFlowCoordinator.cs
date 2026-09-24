@@ -37,6 +37,7 @@ namespace CountersPlus.UI.FlowCoordinators
         [Inject] private SongPreviewPlayer songPreviewPlayer { get; set; }
 
         private bool hasTransitioned = false;
+        private readonly HashSet<PlatformLeaderboardViewController> hiddenMenuLeaderboards = new HashSet<PlatformLeaderboardViewController>();
 
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
@@ -49,6 +50,30 @@ namespace CountersPlus.UI.FlowCoordinators
             ProvideInitialViewControllers(mainScreenNavigation, credits, null, settingsSelection);
 
             RefreshAllMockCounters();
+            HideMenuLeaderboards();
+        }
+
+        private void HideMenuLeaderboards()
+        {
+            foreach (var leaderboard in Resources.FindObjectsOfTypeAll<PlatformLeaderboardViewController>())
+            {
+                if (leaderboard != null && leaderboard.gameObject.activeInHierarchy && hiddenMenuLeaderboards.Add(leaderboard))
+                {
+                    leaderboard.gameObject.SetActive(false);
+                }
+            }
+        }
+
+        private void RestoreMenuLeaderboards()
+        {
+            foreach (var leaderboard in hiddenMenuLeaderboards)
+            {
+                if (leaderboard != null)
+                {
+                    leaderboard.gameObject.SetActive(true);
+                }
+            }
+            hiddenMenuLeaderboards.Clear();
         }
 
         public void DoSceneTransition(Action callback = null)
@@ -182,6 +207,7 @@ namespace CountersPlus.UI.FlowCoordinators
                 menuEnvironmentManager.ShowEnvironmentType(MenuEnvironmentManager.MenuEnvironmentType.Default);
                 fadeInOutController.FadeIn();
                 songPreviewPlayer.CrossfadeToDefault();
+                RestoreMenuLeaderboards();
             });
         }
     }
