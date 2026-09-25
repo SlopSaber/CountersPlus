@@ -1,4 +1,9 @@
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using Heck;
+using Heck.Animation;
 using UnityEngine;
 using Zenject;
 
@@ -8,8 +13,6 @@ namespace CountersPlus.Utils
     [DefaultExecutionOrder(1000)]
     internal sealed class GameplayHUDMotionController : MonoBehaviour
     {
-        private const float LaneTransitionSeconds = 0.25f;
-
         private struct Pose
         {
             internal Vector3 Position;
@@ -22,46 +25,57 @@ namespace CountersPlus.Utils
             }
         }
 
-        private struct LaneRotation
+        private struct LaneSample
         {
             internal float Time;
-            internal Quaternion Rotation;
-            internal float TransitionStartTime;
-            internal Quaternion TransitionStartRotation;
+            internal Quaternion BaseRotation;
+            internal string[] Tracks;
 
-            internal LaneRotation(float time, Quaternion rotation)
+            internal LaneSample(float time, Quaternion baseRotation, string[] tracks)
             {
                 Time = time;
-                Rotation = rotation;
-                TransitionStartTime = time;
-                TransitionStartRotation = Quaternion.identity;
+                BaseRotation = baseRotation;
+                Tracks = tracks;
             }
         }
 
         private readonly Dictionary<Canvas, Pose> _staticCanvases = new Dictionary<Canvas, Pose>();
-        private readonly List<LaneRotation> _laneRotations = new List<LaneRotation>();
+        private readonly List<LaneSample> _laneSamples = new List<LaneSample>();
 
         private CanvasUtility _canvasUtility;
-        private BeatmapObjectManager _beatmapObjectManager;
         private AudioTimeSyncController _audioTimeSyncController;
         private PlayerTransforms _playerTransforms;
+        private Dictionary<string, Track> _tracks;
+        private bool _leftHanded;
         private Transform _playerOrigin;
         private Pose _initialPlayerPose;
 
         [Inject]
-        private void Construct(CanvasUtility canvasUtility, BeatmapObjectManager beatmapObjectManager,
+        private void Construct(CanvasUtility canvasUtility, IReadonlyBeatmapData beatmapData,
             AudioTimeSyncController audioTimeSyncController, PlayerTransforms playerTransforms,
-            GameplayCoreSceneSetupData sceneData)
+            GameplayCoreSceneSetupData sceneData, [InjectOptional] Dictionary<string, Track> tracks)
         {
             _canvasUtility = canvasUtility;
-            _beatmapObjectManager = beatmapObjectManager;
             _audioTimeSyncController = audioTimeSyncController;
             _playerTransforms = playerTransforms;
+            _tracks = tracks;
+            _leftHanded = sceneData.playerSpecificSettings.leftHanded;
 
             if (sceneData.beatmapKey.characteristic != BeatmapCharacteristic.Degree90 &&
                 sceneData.beatmapKey.characteristic != BeatmapCharacteristic.Degree360)
             {
-                _beatmapObjectManager.noteWasSpawnedEvent += NoteWasSpawned;
+                foreach (NoteData noteData in beatmapData.GetBeatmapDataItems<NoteData>(0).OrderBy(note => note.time))
+                {
+                    if (noteData.gameplayType == NoteData.GameplayType.Bomb ||
+                        (_laneSamples.Count > 0 && Mathf.Approximately(_laneSamples[_laneSamples.Count - 1].Time, noteData.time)))
+                    {
+                        continue;
+                    }
+
+                    IDictionary<string, object> customData = noteData.GetType()
+                        .GetProperty("customData")?.GetValue(noteData) as IDictionary<string, object>;
+                    _laneSamples.Add(new LaneSample(noteData.time, ReadRotation(customData), ReadTracks(customData)));
+                }
             }
         }
 
@@ -72,66 +86,41 @@ namespace CountersPlus.Utils
             _initialPlayerPose = new Pose(_playerOrigin);
         }
 
-        private void OnDestroy()
+        private Quaternion ReadRotation(IDictionary<string, object> customData)
         {
-            if (_beatmapObjectManager != null)
+            if (customData == null ||
+                (!customData.TryGetValue("worldRotation", out object value) &&
+                 !customData.TryGetValue("_rotation", out value)) || value == null)
             {
-                _beatmapObjectManager.noteWasSpawnedEvent -= NoteWasSpawned;
+                return Quaternion.identity;
             }
+
+            Quaternion rotation;
+            if (value is IList angles && angles.Count >= 3)
+            {
+                rotation = Quaternion.Euler(Convert.ToSingle(angles[0]), Convert.ToSingle(angles[1]),
+                    Convert.ToSingle(angles[2]));
+            }
+            else
+            {
+                rotation = Quaternion.Euler(0f, Convert.ToSingle(value), 0f);
+            }
+
+            return rotation.Mirror(_leftHanded);
         }
 
-        private void NoteWasSpawned(NoteController noteController)
+        private static string[] ReadTracks(IDictionary<string, object> customData)
         {
-            float time = noteController.noteData.time;
-            Quaternion rotation = noteController.worldRotation;
-
-            // Note spawns are normally ordered. Keep practice seeks and reloads ordered too.
-            int index = _laneRotations.Count;
-            while (index > 0 && _laneRotations[index - 1].Time > time)
+            if (customData == null ||
+                (!customData.TryGetValue("track", out object value) &&
+                 !customData.TryGetValue("_track", out value)) || value == null)
             {
-                index--;
+                return Array.Empty<string>();
             }
 
-            if ((index > 0 && Mathf.Approximately(_laneRotations[index - 1].Time, time)) ||
-                (index < _laneRotations.Count && Mathf.Approximately(_laneRotations[index].Time, time)))
-            {
-                return;
-            }
-
-            _laneRotations.Insert(index, new LaneRotation(time, rotation));
-            RebuildLaneTransitions(index);
-        }
-
-        private void RebuildLaneTransitions(int startIndex)
-        {
-            for (int i = startIndex; i < _laneRotations.Count; i++)
-            {
-                LaneRotation current = _laneRotations[i];
-                if (i > 0)
-                {
-                    LaneRotation previous = _laneRotations[i - 1];
-                    if (Quaternion.Angle(previous.Rotation, current.Rotation) < 0.01f)
-                    {
-                        // Repeated note angles continue the same turn instead of restarting it.
-                        current.TransitionStartTime = previous.TransitionStartTime;
-                        current.TransitionStartRotation = previous.TransitionStartRotation;
-                    }
-                    else
-                    {
-                        current.TransitionStartTime = current.Time;
-                        current.TransitionStartRotation = EvaluateLaneRotation(previous, current.Time);
-                    }
-                }
-
-                _laneRotations[i] = current;
-            }
-        }
-
-        private static Quaternion EvaluateLaneRotation(LaneRotation laneRotation, float time)
-        {
-            float progress = Mathf.Clamp01((time - laneRotation.TransitionStartTime) / LaneTransitionSeconds);
-            return Quaternion.Slerp(laneRotation.TransitionStartRotation, laneRotation.Rotation,
-                Mathf.SmoothStep(0f, 1f, progress));
+            if (value is string name) return new[] { name };
+            if (value is IEnumerable names) return names.Cast<object>().OfType<string>().ToArray();
+            return Array.Empty<string>();
         }
 
         private void LateUpdate()
@@ -175,14 +164,16 @@ namespace CountersPlus.Utils
 
         private Quaternion CurrentLaneRotation()
         {
+            if (_laneSamples.Count == 0) return Quaternion.identity;
+
             float songTime = _audioTimeSyncController.songTime;
             int low = 0;
-            int high = _laneRotations.Count - 1;
+            int high = _laneSamples.Count - 1;
             int current = -1;
             while (low <= high)
             {
                 int middle = low + ((high - low) / 2);
-                if (_laneRotations[middle].Time <= songTime)
+                if (_laneSamples[middle].Time <= songTime)
                 {
                     current = middle;
                     low = middle + 1;
@@ -193,9 +184,43 @@ namespace CountersPlus.Utils
                 }
             }
 
-            return current >= 0
-                ? EvaluateLaneRotation(_laneRotations[current], songTime)
-                : Quaternion.identity;
+            if (current < 0) return SampleRotation(_laneSamples[0]);
+            LaneSample from = _laneSamples[current];
+            Quaternion fromRotation = SampleRotation(from);
+            if (current == _laneSamples.Count - 1) return fromRotation;
+
+            LaneSample to = _laneSamples[current + 1];
+            if (from.Tracks.Length > 0 && SameTracks(from.Tracks, to.Tracks)) return fromRotation;
+
+            float progress = Mathf.InverseLerp(from.Time, to.Time, songTime);
+            return Quaternion.Slerp(fromRotation, SampleRotation(to), progress);
+        }
+
+        private Quaternion SampleRotation(LaneSample sample)
+        {
+            Quaternion rotation = sample.BaseRotation;
+            if (_tracks == null) return rotation;
+            foreach (string name in sample.Tracks)
+            {
+                if (_tracks.TryGetValue(name, out Track track))
+                {
+                    rotation *= (track.GetProperty<Quaternion>("offsetWorldRotation") ?? Quaternion.identity)
+                        .Mirror(_leftHanded);
+                }
+            }
+
+            return rotation;
+        }
+
+        private static bool SameTracks(string[] first, string[] second)
+        {
+            if (first.Length != second.Length) return false;
+            for (int i = 0; i < first.Length; i++)
+            {
+                if (first[i] != second[i]) return false;
+            }
+
+            return true;
         }
     }
 }
