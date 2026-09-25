@@ -14,6 +14,7 @@ namespace CountersPlus.Utils
 
         private Dictionary<int, Canvas> CanvasIDToCanvas = new Dictionary<int, Canvas>();
         private Dictionary<Canvas, HUDCanvas> CanvasToSettings = new Dictionary<Canvas, HUDCanvas>();
+        internal IEnumerable<Canvas> Canvases => CanvasIDToCanvas.Values;
         private Canvas energyCanvas = null;
         private MainConfigModel mainConfig;
 

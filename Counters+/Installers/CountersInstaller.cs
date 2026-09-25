@@ -27,6 +27,7 @@ namespace CountersPlus.Installers
 
             /// LOADING IMPORTANT SHIT LIKE CANVASES AND STUFF ///
             Container.Bind<CanvasUtility>().AsSingle();
+            Container.BindInterfacesAndSelfTo<GameplayHUDMotionController>().FromNewComponentOnRoot().AsSingle().NonLazy();
 
             Container.Bind<NoteCountProcessor>().To<GenericNoteCountProcessor>().AsSingle();
 

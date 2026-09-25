@@ -5,6 +5,7 @@ namespace CountersPlus.Utils
     public class SoftParent : MonoBehaviour
     {
         private Transform parent;
+        internal Transform Parent => parent;
         private Vector3 oldWorldPos;
         private Quaternion oldWorldRotation;
 
