@@ -8,6 +8,8 @@ namespace CountersPlus.Utils
     [DefaultExecutionOrder(1000)]
     internal sealed class GameplayHUDMotionController : MonoBehaviour
     {
+        private const float LaneTransitionSeconds = 0.25f;
+
         private struct Pose
         {
             internal Vector3 Position;
@@ -24,11 +26,15 @@ namespace CountersPlus.Utils
         {
             internal float Time;
             internal Quaternion Rotation;
+            internal float TransitionStartTime;
+            internal Quaternion TransitionStartRotation;
 
             internal LaneRotation(float time, Quaternion rotation)
             {
                 Time = time;
                 Rotation = rotation;
+                TransitionStartTime = time;
+                TransitionStartRotation = Quaternion.identity;
             }
         }
 
@@ -64,7 +70,6 @@ namespace CountersPlus.Utils
             // Noodle inserts its root above the origin transform during scene initialization.
             _playerOrigin = _playerTransforms._originTransform.parent;
             _initialPlayerPose = new Pose(_playerOrigin);
-
         }
 
         private void OnDestroy()
@@ -87,12 +92,46 @@ namespace CountersPlus.Utils
                 index--;
             }
 
-            if (index > 0 && Mathf.Approximately(_laneRotations[index - 1].Time, time))
+            if ((index > 0 && Mathf.Approximately(_laneRotations[index - 1].Time, time)) ||
+                (index < _laneRotations.Count && Mathf.Approximately(_laneRotations[index].Time, time)))
             {
                 return;
             }
 
             _laneRotations.Insert(index, new LaneRotation(time, rotation));
+            RebuildLaneTransitions(index);
+        }
+
+        private void RebuildLaneTransitions(int startIndex)
+        {
+            for (int i = startIndex; i < _laneRotations.Count; i++)
+            {
+                LaneRotation current = _laneRotations[i];
+                if (i > 0)
+                {
+                    LaneRotation previous = _laneRotations[i - 1];
+                    if (Quaternion.Angle(previous.Rotation, current.Rotation) < 0.01f)
+                    {
+                        // Repeated note angles continue the same turn instead of restarting it.
+                        current.TransitionStartTime = previous.TransitionStartTime;
+                        current.TransitionStartRotation = previous.TransitionStartRotation;
+                    }
+                    else
+                    {
+                        current.TransitionStartTime = current.Time;
+                        current.TransitionStartRotation = EvaluateLaneRotation(previous, current.Time);
+                    }
+                }
+
+                _laneRotations[i] = current;
+            }
+        }
+
+        private static Quaternion EvaluateLaneRotation(LaneRotation laneRotation, float time)
+        {
+            float progress = Mathf.Clamp01((time - laneRotation.TransitionStartTime) / LaneTransitionSeconds);
+            return Quaternion.Slerp(laneRotation.TransitionStartRotation, laneRotation.Rotation,
+                Mathf.SmoothStep(0f, 1f, progress));
         }
 
         private void LateUpdate()
@@ -154,7 +193,9 @@ namespace CountersPlus.Utils
                 }
             }
 
-            return current >= 0 ? _laneRotations[current].Rotation : Quaternion.identity;
+            return current >= 0
+                ? EvaluateLaneRotation(_laneRotations[current], songTime)
+                : Quaternion.identity;
         }
     }
 }
