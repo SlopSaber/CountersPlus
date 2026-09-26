@@ -5,6 +5,7 @@ using BeatSaberMarkupLanguage.ViewControllers;
 using CountersPlus.Utils;
 using CountersPlus.Custom;
 using CountersPlus.ConfigModels;
+using System;
 using System.Reflection;
 using System.Collections;
 using System.Collections.Generic;
@@ -32,6 +33,8 @@ namespace CountersPlus.UI.ViewControllers.Editing
         private Dictionary<ConfigModel, HashSet<GameObject>> cachedSettings = new Dictionary<ConfigModel, HashSet<GameObject>>();
 
         private ConfigModel editingConfigModel = null;
+        private readonly Dictionary<ConfigModel, (Func<int, HUDCanvas> CanvasById, Func<HUDCanvas, int> CanvasId,
+            Func<List<HUDCanvas>> Canvases, Action Changed)> configCallbacks = new();
 
         internal void ApplySettings(ConfigModel model)
         {
@@ -52,6 +55,8 @@ namespace CountersPlus.UI.ViewControllers.Editing
             model.GetCanvasIDFromCanvasSettings = (v) => mainConfig.HUDConfig.OtherCanvasSettings.IndexOf(v);
             model.GetAllCanvases = () => GetAllCanvases();
             model.OnConfigChanged = () => mockCounter.UpdateMockCounter(model);
+            configCallbacks[model] = (model.GetCanvasFromID, model.GetCanvasIDFromCanvasSettings,
+                model.GetAllCanvases, model.OnConfigChanged);
 
             if (cachedSettings.TryGetValue(model, out var cache))
             {
@@ -149,6 +154,22 @@ namespace CountersPlus.UI.ViewControllers.Editing
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemEnabling)
         {
             mainConfig.OnConfigChanged -= MainConfig_OnConfigChanged;
+        }
+
+        protected override void OnDestroy()
+        {
+            if (mainConfig != null) mainConfig.OnConfigChanged -= MainConfig_OnConfigChanged;
+            foreach (var pair in configCallbacks)
+            {
+                var model = pair.Key;
+                var callbacks = pair.Value;
+                if (model.GetCanvasFromID == callbacks.CanvasById) model.GetCanvasFromID = null;
+                if (model.GetCanvasIDFromCanvasSettings == callbacks.CanvasId) model.GetCanvasIDFromCanvasSettings = null;
+                if (model.GetAllCanvases == callbacks.Canvases) model.GetAllCanvases = null;
+                if (model.OnConfigChanged == callbacks.Changed) model.OnConfigChanged = null;
+            }
+            configCallbacks.Clear();
+            base.OnDestroy();
         }
     }
 }

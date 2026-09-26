@@ -18,6 +18,8 @@ namespace CountersPlus.Counters
         private float fastestSpeed = float.NaN;
         private TMP_Text averageCounter;
         private TMP_Text fastestCounter;
+        private int lastPrecision = int.MinValue;
+        private string speedFormat;
 
         private float t;
 
@@ -50,6 +52,11 @@ namespace CountersPlus.Counters
         public void Tick()
         {
             int precision = Settings.DecimalPrecision;
+            if (precision != lastPrecision)
+            {
+                speedFormat = $"F{precision}";
+                lastPrecision = precision;
+            }
             // YES I AM USING GOTO TO LIMIT CODE DUPLICATION NOW STOP FLAMING ME
             switch (Settings.Mode)
             {
@@ -63,7 +70,7 @@ namespace CountersPlus.Counters
                 case SpeedMode.Average:
                     rightSpeedTotal += (right.bladeSpeed + left.bladeSpeed) / 2f;
                     rightSampleCount++;
-                    averageCounter.text = ((float)(rightSpeedTotal / rightSampleCount)).ToString($"F{precision}");
+                    averageCounter.text = ((float)(rightSpeedTotal / rightSampleCount)).ToString(speedFormat);
                     break;
 
                 case SpeedMode.SplitBoth:
@@ -74,7 +81,7 @@ namespace CountersPlus.Counters
                     leftSpeedTotal += left.bladeSpeed;
                     rightSampleCount++;
                     leftSampleCount++;
-                    averageCounter.text = $"{((float)(leftSpeedTotal / leftSampleCount)).ToString($"F{precision}")} | {((float)(rightSpeedTotal / rightSampleCount)).ToString($"F{precision}")}";
+                    averageCounter.text = $"{((float)(leftSpeedTotal / leftSampleCount)).ToString(speedFormat)} | {((float)(rightSpeedTotal / rightSampleCount)).ToString(speedFormat)}";
                     break;
             }
         }
@@ -88,7 +95,7 @@ namespace CountersPlus.Counters
             if (t >= 5)
             {
                 t = 0;
-                fastestCounter.text = fastestSpeed.ToString($"F{Settings.DecimalPrecision}");
+                fastestCounter.text = fastestSpeed.ToString(speedFormat);
                 fastestSpeed = float.NaN;
             }
         }

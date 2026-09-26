@@ -23,6 +23,8 @@ namespace CountersPlus.Counters
         private ImageView progressRing;
         private float length = 0;
         private float songBPM = 100;
+        private float lastTextValue = float.NaN;
+        private ProgressMode lastMode;
 
         public override void CounterInit()
         {
@@ -78,14 +80,25 @@ namespace CountersPlus.Counters
             if (Settings.ProgressTimeLeft) time = length - time;
             if (time <= 0f) return;
 
+            bool modeChanged = lastMode != Settings.Mode;
+            lastMode = Settings.Mode;
             switch (Settings.Mode)
             {
                 case ProgressMode.TimeInBeats:
                     float beats = Mathf.Round(songBPM / 60 * time / 0.25f) * 0.25f;
-                    timeText.text = beats.ToString("F2");
+                    if (modeChanged || beats != lastTextValue)
+                    {
+                        timeText.text = beats.ToString("F2");
+                        lastTextValue = beats;
+                    }
                     break;
                 case ProgressMode.Original:
-                    timeText.text = $"{Math.Floor(time / 60):N0}:{Math.Floor(time % 60):00}";
+                    float seconds = Mathf.Floor(time);
+                    if (modeChanged || seconds != lastTextValue)
+                    {
+                        timeText.text = $"{Math.Floor(time / 60):N0}:{Math.Floor(time % 60):00}";
+                        lastTextValue = seconds;
+                    }
                     break;
                 default:
                     timeText.text = $"{time / length * 100:00}%";

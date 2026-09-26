@@ -76,5 +76,15 @@ namespace CountersPlus.UI.ViewControllers.Editing
             for (int i = 0; i < transform.childCount; i++)
                 Destroy(transform.GetChild(i).gameObject);
         }
+
+        protected override void OnDestroy()
+        {
+            if (currentlyEditing != null)
+            {
+                currentlyEditing.OnCanvasSettingsChanged -= CurrentlyEditing_OnCanvasSettingsChanged;
+                currentlyEditing.OnCanvasSettingsApply -= CurrentlyEditing_OnCanvasSettingsApply;
+            }
+            base.OnDestroy();
+        }
     }
 }

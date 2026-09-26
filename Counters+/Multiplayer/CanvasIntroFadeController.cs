@@ -47,7 +47,8 @@ namespace CountersPlus.Multiplayer
 
             var alpha = coreGameHUDCanvasGroup.alpha;
 
-            countersPlusCanvasGroups.ForEach(canvas => canvas.alpha = alpha);
+            foreach (CanvasGroup canvas in countersPlusCanvasGroups)
+                canvas.alpha = alpha;
         }
 
         public void Dispose()
