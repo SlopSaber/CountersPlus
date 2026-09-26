@@ -93,7 +93,6 @@ namespace CountersPlus.Counters
             }
 
             progressRing.fillAmount = (Settings.IncludeRing ? time : atsc.songTime) / length;
-            progressRing.SetVerticesDirty();
         }
 
         private ImageView CreateRing(Canvas canvas)

@@ -1,7 +1,5 @@
 ﻿using CountersPlus.ConfigModels;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -14,10 +12,13 @@ namespace CountersPlus.Counters
 
         private Saber leftSaber = null;
         private Saber rightSaber = null;
-        private List<float> rightAngles = new List<float>();
-        private List<float> leftAngles = new List<float>();
-        private List<Quaternion> rightQuaternions = new List<Quaternion>();
-        private List<Quaternion> leftQuaternions = new List<Quaternion>();
+        private double rightAngleTotal;
+        private double leftAngleTotal;
+        private Quaternion previousRightRotation;
+        private Quaternion previousLeftRotation;
+        private bool hasPreviousRotation;
+        private Utils.SharedCoroutineStarter coroutineStarter;
+        private Coroutine secondTick;
         private float highestSpin;
         private TMP_Text spinometer;
 
@@ -26,7 +27,15 @@ namespace CountersPlus.Counters
             leftSaber = saberManager.leftSaber;
             rightSaber = saberManager.rightSaber;
             GenerateBasicText("Spinometer", out spinometer);
-            Utils.SharedCoroutineStarter.instance.StartCoroutine(SecondTick());
+            coroutineStarter = Utils.SharedCoroutineStarter.instance;
+            secondTick = coroutineStarter.StartCoroutine(SecondTick());
+        }
+
+        public override void CounterDestroy()
+        {
+            if (coroutineStarter != null && secondTick != null)
+                coroutineStarter.StopCoroutine(secondTick);
+            secondTick = null;
         }
 
         public void Tick()
@@ -39,26 +48,29 @@ namespace CountersPlus.Counters
             {
                 rightSaber = saberManager.rightSaber;
             }
-            leftQuaternions.Add(leftSaber.transform.rotation);
-            rightQuaternions.Add(rightSaber.transform.rotation);
-            if (leftQuaternions.Count >= 2 && rightQuaternions.Count >= 2)
+            Quaternion leftRotation = leftSaber.transform.rotation;
+            Quaternion rightRotation = rightSaber.transform.rotation;
+            if (hasPreviousRotation)
             {
-                leftAngles.Add(Quaternion.Angle(leftQuaternions.Last(), leftQuaternions[leftQuaternions.Count - 2]));
-                rightAngles.Add(Quaternion.Angle(rightQuaternions.Last(), rightQuaternions[rightQuaternions.Count - 2]));
+                leftAngleTotal += Quaternion.Angle(leftRotation, previousLeftRotation);
+                rightAngleTotal += Quaternion.Angle(rightRotation, previousRightRotation);
             }
+            previousLeftRotation = leftRotation;
+            previousRightRotation = rightRotation;
+            hasPreviousRotation = true;
         }
 
         private IEnumerator SecondTick()
         {
+            var wait = new WaitForSecondsRealtime(1);
             while (true)
             {
-                yield return new WaitForSecondsRealtime(1);
-                leftQuaternions.Clear();
-                rightQuaternions.Clear();
-                float leftSpeed = leftAngles.Sum();
-                float rightSpeed = rightAngles.Sum();
-                leftAngles.Clear();
-                rightAngles.Clear();
+                yield return wait;
+                hasPreviousRotation = false;
+                float leftSpeed = (float)leftAngleTotal;
+                float rightSpeed = (float)rightAngleTotal;
+                leftAngleTotal = 0;
+                rightAngleTotal = 0;
                 float averageSpeed = (leftSpeed + rightSpeed) / 2;
                 if (leftSpeed > highestSpin) highestSpin = leftSpeed;
                 if (rightSpeed > highestSpin) highestSpin = rightSpeed;

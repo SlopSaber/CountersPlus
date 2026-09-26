@@ -2,6 +2,8 @@
 using UnityEngine;
 using CountersPlus.Utils;
 using BeatSaberMarkupLanguage.Components;
+using System.Collections.Generic;
+using System.Reflection;
 
 namespace CountersPlus.UI.SettingGroups
 {
@@ -10,6 +12,7 @@ namespace CountersPlus.UI.SettingGroups
     /// </summary>
     public abstract class SettingsGroup
     {
+        private static readonly Dictionary<(Assembly, string), Sprite> sprites = new Dictionary<(Assembly, string), Sprite>();
         public abstract int NumberOfCells();
 
         public virtual CustomListTableData.CustomCellInfo CellInfoForIdx(int idx)
@@ -25,6 +28,17 @@ namespace CountersPlus.UI.SettingGroups
 
         public virtual int CellToSelect() => 0;
 
-        protected Sprite LoadSprite(string name) => ImagesUtility.LoadSpriteFromResources($"CountersPlus.UI.Images.{name}.png");
+        protected Sprite LoadSprite(string name) => LoadSprite(typeof(SettingsGroup).Assembly, $"CountersPlus.UI.Images.{name}.png");
+
+        protected Sprite LoadSprite(Assembly assembly, string resourcePath)
+        {
+            var key = (assembly, resourcePath);
+            if (!sprites.TryGetValue(key, out Sprite sprite) || sprite == null)
+            {
+                sprite = ImagesUtility.LoadSpriteFromExternalAssemblyResources(assembly, resourcePath);
+                sprites[key] = sprite;
+            }
+            return sprite;
+        }
     }
 }

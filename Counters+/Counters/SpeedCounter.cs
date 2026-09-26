@@ -1,7 +1,4 @@
 ﻿using CountersPlus.ConfigModels;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using TMPro;
 using UnityEngine;
 using Zenject;
@@ -14,9 +11,11 @@ namespace CountersPlus.Counters
 
         private Saber right;
         private Saber left;
-        private List<float> rSpeedList = new List<float>();
-        private List<float> lSpeedList = new List<float>();
-        private List<float> fastest = new List<float>();
+        private double rightSpeedTotal;
+        private double leftSpeedTotal;
+        private long rightSampleCount;
+        private long leftSampleCount;
+        private float fastestSpeed = float.NaN;
         private TMP_Text averageCounter;
         private TMP_Text fastestCounter;
 
@@ -62,17 +61,20 @@ namespace CountersPlus.Counters
                     TickFastestSpeed();
                     goto case SpeedMode.Average;
                 case SpeedMode.Average:
-                    rSpeedList.Add((right.bladeSpeed + left.bladeSpeed) / 2f);
-                    averageCounter.text = rSpeedList.Average().ToString($"F{precision}");
+                    rightSpeedTotal += (right.bladeSpeed + left.bladeSpeed) / 2f;
+                    rightSampleCount++;
+                    averageCounter.text = ((float)(rightSpeedTotal / rightSampleCount)).ToString($"F{precision}");
                     break;
 
                 case SpeedMode.SplitBoth:
                     TickFastestSpeed();
                     goto case SpeedMode.SplitAverage;
                 case SpeedMode.SplitAverage:
-                    rSpeedList.Add(right.bladeSpeed);
-                    lSpeedList.Add(left.bladeSpeed);
-                    averageCounter.text = $"{lSpeedList.Average().ToString($"F{precision}")} | {rSpeedList.Average().ToString($"F{precision}")}";
+                    rightSpeedTotal += right.bladeSpeed;
+                    leftSpeedTotal += left.bladeSpeed;
+                    rightSampleCount++;
+                    leftSampleCount++;
+                    averageCounter.text = $"{((float)(leftSpeedTotal / leftSampleCount)).ToString($"F{precision}")} | {((float)(rightSpeedTotal / rightSampleCount)).ToString($"F{precision}")}";
                     break;
             }
         }
@@ -80,14 +82,14 @@ namespace CountersPlus.Counters
         // Ticked function instead of IEnumerator because its legit just better
         private void TickFastestSpeed()
         {
-            fastest.Add((right.bladeSpeed + left.bladeSpeed) / 2f);
+            float speed = (right.bladeSpeed + left.bladeSpeed) / 2f;
+            if (speed > fastestSpeed || float.IsNaN(fastestSpeed)) fastestSpeed = speed;
             t += Time.deltaTime;
             if (t >= 5)
             {
                 t = 0;
-                var top = fastest.Max();
-                fastest.Clear();
-                fastestCounter.text = top.ToString($"F{Settings.DecimalPrecision}");
+                fastestCounter.text = fastestSpeed.ToString($"F{Settings.DecimalPrecision}");
+                fastestSpeed = float.NaN;
             }
         }
     }

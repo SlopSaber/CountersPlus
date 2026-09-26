@@ -19,6 +19,8 @@ namespace CountersPlus.Counters
         [Inject] private BeatmapKey beatmapKey { get; set; }
         private int count = 0;
         private TMP_Text counter;
+        private Utils.SharedCoroutineStarter coroutineStarter;
+        private Coroutine colorAnimation;
 
         public override void CounterInit()
         {
@@ -48,24 +50,31 @@ namespace CountersPlus.Counters
         public override void CounterDestroy()
         {
             energyCounter.gameEnergyDidReach0Event -= SlowlyAnnoyThePlayerBecauseTheyFailed;
+            if (coroutineStarter != null && colorAnimation != null)
+                coroutineStarter.StopCoroutine(colorAnimation);
+            colorAnimation = null;
         }
 
         private void SlowlyAnnoyThePlayerBecauseTheyFailed()
         {
             counter.text = (count + 1).ToString();
-            Utils.SharedCoroutineStarter.instance.StartCoroutine(ChangeTextColorToAnnoyThePlayerEvenMore());
+            coroutineStarter = Utils.SharedCoroutineStarter.instance;
+            if (colorAnimation != null) coroutineStarter.StopCoroutine(colorAnimation);
+            colorAnimation = coroutineStarter.StartCoroutine(ChangeTextColorToAnnoyThePlayerEvenMore());
         }
 
         private IEnumerator ChangeTextColorToAnnoyThePlayerEvenMore()
         {
             float t = 0;
+            var wait = new WaitForEndOfFrame();
             while (t <= 1)
             {
-                yield return new WaitForEndOfFrame();
+                yield return wait;
                 t += Time.deltaTime;
                 counter.color = Color.Lerp(Color.white, Color.red, t);
             }
             counter.color = Color.red;
+            colorAnimation = null;
         }
 
         private long LongExponent(long x, int pow)

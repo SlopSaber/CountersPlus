@@ -19,6 +19,8 @@ namespace CountersPlus.Utils
         private TMP_FontAsset mainFont = BeatSaberUI.MainTextFont;
 
         private byte originalItalicStyle = 0;
+        private HarmonyLib.Harmony harmony;
+        private bool appliedStyle;
 
         private IEnumerable<TMP_Text> allText = Enumerable.Empty<TMP_Text>();
 
@@ -26,7 +28,7 @@ namespace CountersPlus.Utils
         {
             // BEHOLD! MY NO-NOITALICS-INATOR!!!
             var dummy = FontStyles.Normal;
-            var harmony = new HarmonyLib.Harmony("com.caeden117.countersplus.haha-april-fools-funny");
+            harmony = new HarmonyLib.Harmony("com.caeden117.countersplus.haha-april-fools-funny");
             harmony.Patch(typeof(TMP_Text).GetProperty("fontStyle").GetSetMethod(),
                 new HarmonyMethod(SymbolExtensions.GetMethodInfo(() => Prefix(ref dummy)), int.MinValue));
 
@@ -41,24 +43,27 @@ namespace CountersPlus.Utils
 
         public void Dispose()
         {
+            harmony?.UnpatchSelf();
             mainFont.italicStyle = originalItalicStyle;
         }
 
         public void Tick()
         {
+            t += Time.deltaTime;
+            byte italicStyle = (byte)Mathf.Clamp(Mathf.Abs(t / 5 * Mathf.Sin(t / 5) / 5), 0, byte.MaxValue);
+            if (appliedStyle && mainFont.italicStyle == italicStyle) return;
+
             if (!allText.Any())
             {
                 allText = Resources.FindObjectsOfTypeAll<CurvedTextMeshPro>().Where(x => x != null && x.isActiveAndEnabled);
             }
 
-            t += Time.deltaTime;
+            mainFont.italicStyle = italicStyle;
 
-            // THESE GUYS ARE GONNA BECOME MORE AND MORE ITALIC WHILE THE SONG GOES ON
-            mainFont.italicStyle = (byte)Mathf.Clamp(Mathf.Abs(t / 5 * Mathf.Sin(t / 5) / 5), 0, byte.MaxValue);
-
-            // THIS IS SUPER EXPENSIVE, PROBABLY FRAME KILLING, BUT THE OPPORTUNITY IS TOO GOOD TO PASS UP
+            // Rebuild text only when its visible italic angle changes.
             foreach (var tmp in allText)
             {
+                appliedStyle = true;
                 tmp.fontStyle = tmp.fontStyle;
                 tmp.font = mainFont;
                 tmp.SetAllDirty(); // holy shit this is so dirty

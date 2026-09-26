@@ -9,6 +9,8 @@ namespace CountersPlus.Counters.Custom
     /// </summary>
     public class CanvasCustomCounter : BasicCustomCounter
     {
+        private Utils.SharedCoroutineStarter coroutineStarter;
+        private Coroutine canvasSearch;
         /// <summary>
         /// The name of the Canvas that this Custom Counter will look for.
         /// Use this if Counters+ does not immediately find the Canvas on startup.
@@ -29,7 +31,8 @@ namespace CountersPlus.Counters.Custom
             }
             else if (!string.IsNullOrEmpty(CanvasObjectName))
             {
-                Utils.SharedCoroutineStarter.instance.StartCoroutine(FindCanvasByString());
+                coroutineStarter = Utils.SharedCoroutineStarter.instance;
+                canvasSearch = coroutineStarter.StartCoroutine(FindCanvasByString());
             }
             else
             {
@@ -77,8 +80,14 @@ namespace CountersPlus.Counters.Custom
             }
             if (canvas != null) ReparentCanvas(canvas);
             else Plugin.Logger.Warn($"Custom Counter ({Settings.AttachedCustomCounter.Name}) could not find its Canvas in 10 tries.");
+            canvasSearch = null;
         }
 
-        public override void CounterDestroy() { }
+        public override void CounterDestroy()
+        {
+            if (coroutineStarter != null && canvasSearch != null)
+                coroutineStarter.StopCoroutine(canvasSearch);
+            canvasSearch = null;
+        }
     }
 }

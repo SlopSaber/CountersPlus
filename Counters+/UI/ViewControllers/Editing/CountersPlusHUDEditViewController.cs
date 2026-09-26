@@ -57,7 +57,6 @@ namespace CountersPlus.UI.ViewControllers.Editing
         private void CurrentlyEditing_OnCanvasSettingsChanged()
         {
             canvasUtility.UnregisterCanvas(canvasID);
-            canvasUtility.CreateCanvasWithConfig(currentlyEditing);
             if (currentlyEditing.IsMainCanvas)
             {
                 hudConfig.MainCanvasSettings = currentlyEditing;

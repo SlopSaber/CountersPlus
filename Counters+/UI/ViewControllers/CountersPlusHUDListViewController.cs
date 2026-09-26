@@ -21,6 +21,7 @@ namespace CountersPlus.UI.ViewControllers
 
         public bool IsDeleting = false;
         public int SelectedCanvas { get; private set; } = -1;
+        private Sprite blankSprite;
 
         [UIComponent("list")] private CustomListTableData data { get; set; }
         [UIComponent("new-canvas-name")] private ModalKeyboard newCanvasKeyboard { get; set; }
@@ -49,6 +50,7 @@ namespace CountersPlus.UI.ViewControllers
 
         public void RefreshData()
         {
+            if (blankSprite == null) blankSprite = Utilities.LoadSpriteFromTexture(Texture2D.blackTexture);
             data.Data.Clear();
             for (int i = -1; i < hudConfig.OtherCanvasSettings.Count; i++)
             {
@@ -56,10 +58,16 @@ namespace CountersPlus.UI.ViewControllers
                 int countersUsingCanvas = flowCoordinator.Value.AllConfigModels.Count(x => x.CanvasID == i);
                 var info = new CustomListTableData.CustomCellInfo(
                     settings?.Name ?? "Unknown",
-                    $"{countersUsingCanvas} counter(s) use this Canvas.", Utilities.LoadSpriteFromTexture(Texture2D.blackTexture));
+                    $"{countersUsingCanvas} counter(s) use this Canvas.", blankSprite);
                 data.Data.Add(info);
             }
             data.TableView.ReloadData();
+        }
+
+        protected override void OnDestroy()
+        {
+            if (blankSprite != null) Destroy(blankSprite);
+            base.OnDestroy();
         }
 
         public void CreateNewCanvasDialog()

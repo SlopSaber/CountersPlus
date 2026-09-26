@@ -23,7 +23,7 @@ namespace CountersPlus.UI.SettingGroups
                 {
                     try
                     {
-                        return new CountersPlusListTableCell(idx, customConfig.AttachedCustomCounter.Name, null, ImagesUtility.LoadSpriteFromExternalAssemblyResources(
+                        return new CountersPlusListTableCell(idx, customConfig.AttachedCustomCounter.Name, null, LoadSprite(
                             customConfig.AttachedCustomCounter.CounterType.Assembly, customConfig.AttachedCustomCounter.BSML.Icon));
                     }
                     catch
