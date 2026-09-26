@@ -33,8 +33,12 @@ namespace CountersPlus.Utils
         public void AssignParent(Transform newParent)
         {
             parent = newParent;
-            posOffset = parent.position - oldWorldPos;
-            rotOffset = parent.rotation * Quaternion.Inverse(oldWorldRotation);
+            Vector3 worldOffset = parent.position - oldWorldPos;
+            posOffset = new Vector3(
+                Vector3.Dot(worldOffset, parent.right),
+                worldOffset.y,
+                Vector3.Dot(worldOffset, parent.forward));
+            rotOffset = Quaternion.Inverse(oldWorldRotation) * parent.rotation;
         }
 
         public void AssignOffsets(Vector3 positionOffset, Quaternion rotationOffset)

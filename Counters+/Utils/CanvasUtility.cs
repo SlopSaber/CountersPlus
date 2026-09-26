@@ -18,9 +18,7 @@ namespace CountersPlus.Utils
         private Canvas energyCanvas = null;
         private MainConfigModel mainConfig;
 
-        private float hudWidth = 3.2f;
         private float hudDepth = 7f;
-        private float hudHeight = 0f;
 
         // Using the magical power of Zenject™, we magically find ourselves with an instance of
         // our HUDConfigModel and the CoreGameHUDController.
@@ -33,11 +31,7 @@ namespace CountersPlus.Utils
             this.mainConfig = mainConfig;
             if (coreGameHUD != null)
             {
-                var comboPos = coreGameHUD.GetComponentInChildren<ComboUIController>().transform.position;
-
-                hudWidth = Mathf.Abs(comboPos.x);
-                hudHeight = comboPos.y;
-                hudDepth = comboPos.z;
+                hudDepth = coreGameHUD.GetComponentInChildren<ComboUIController>().transform.position.z;
 
                 energyCanvas = coreGameHUD.energyPanelGo.GetComponent<Canvas>();
 
@@ -62,22 +56,8 @@ namespace CountersPlus.Utils
             CanvasToSettings.Add(CanvasIDToCanvas[-1], hudConfig.MainCanvasSettings);
             if (coreGameHUD != null && hudConfig.MainCanvasSettings.ParentedToBaseGameHUD)
             {
-                Transform parent = coreGameHUD.transform;
-                //if (HUDType == GameplayCoreHUDInstaller.HudType.Flying) parent = coreGameHUD.transform.GetChild(0);
                 SoftParent softParent = CanvasIDToCanvas[-1].gameObject.AddComponent<SoftParent>();
-                softParent.AssignParent(parent);
-
-                // Base Game HUD is rotated backwards, so we have to reflect our vector to match.
-                Vector3 position = hudConfig.MainCanvasSettings.Position;
-
-                position.y = hudHeight * -1;
-
-                if (hudConfig.MainCanvasSettings.MatchBaseGameHUDDepth) position.z = hudDepth;
-
-                Vector3 posOofset = Vector3.Reflect(position, Vector3.back); // yknow what, fuck it, its posOofset now.
-                Quaternion rotOofset = Quaternion.Euler(Vector3.Reflect(hudConfig.MainCanvasSettings.Rotation, Vector3.back));
-
-                softParent.AssignOffsets(posOofset, rotOofset);
+                softParent.AssignParent(coreGameHUD.transform);
             }
             for (int i = 0; i < hudConfig.OtherCanvasSettings.Count; i++)
             {
@@ -229,8 +209,6 @@ namespace CountersPlus.Utils
             CounterPositions position = settings.Position;
             float index = settings.Distance;
             var pos = new Vector3(); // Base position
-            var hudHeightOffset = new Vector3();
-
             float belowEnergyOffset = -1.5f;
             float aboveHighwayOffset = 0.75f;
 
@@ -239,15 +217,6 @@ namespace CountersPlus.Utils
             var canvasSettings = GetCanvasSettingsFromID(settings.CanvasID);
 
             Vector3 offset = new Vector3(0, -0.75f * (index * canvasSettings.DistanceModifier), 0); // Offset
-
-            if (canvasSettings != null)
-            {
-                if (canvasSettings.ParentedToBaseGameHUD && (canvasSettings.MatchBaseGameHUDDepth || canvasSettings.IsMainCanvas))
-                {
-                    X = hudWidth;
-                    hudHeightOffset = new Vector3(0, -hudHeight, 0);
-                }
-            }
 
             switch (position)
             {
@@ -273,7 +242,7 @@ namespace CountersPlus.Utils
                     offset = new Vector3(0, (offset.y * -1) + aboveHighwayOffset, 0);
                     break;
             }
-            return pos + offset + hudHeightOffset;
+            return pos + offset;
         }
 
         public void ClearAllText()
