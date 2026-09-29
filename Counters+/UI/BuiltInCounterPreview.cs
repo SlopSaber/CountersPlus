@@ -23,17 +23,23 @@ namespace CountersPlus.UI
                         : "123 / 125");
                     break;
                 case ProgressConfigModel progress:
-                    Progress(preview, progress);
+                    if (progress.Mode != ProgressMode.BaseGame || !BaseGameCounterPreview.TryProgress(preview))
+                        Progress(preview, progress);
                     break;
                 case ScoreConfigModel score:
-                    Score(preview, score);
+                    if (!BaseGameCounterPreview.TryScore(preview, score, mainConfig))
+                        Score(preview, score);
                     break;
                 case ComboConfigModel _:
-                    Text(preview, "128", 5);
+                    if (!BaseGameCounterPreview.TryCombo(preview))
+                        Text(preview, "128", 5);
                     break;
                 case MultiplierConfigModel _:
-                    TMP_Text multiplier = Text(preview, "x4", 4);
-                    multiplier.fontStyle = FontStyles.Italic;
+                    if (!BaseGameCounterPreview.TryMultiplier(preview))
+                    {
+                        TMP_Text multiplier = Text(preview, "x4", 4);
+                        multiplier.fontStyle = FontStyles.Italic;
+                    }
                     break;
                 case PBConfigModel pb:
                     PersonalBest(preview, pb, mainConfig);
@@ -59,7 +65,8 @@ namespace CountersPlus.UI
                     Basic(preview, fail.ShowRestartsInstead ? "Restarts" : "Fails", "1");
                     break;
                 case MultiplayerRankConfigModel _:
-                    Text(preview, "#2 / 8", 4);
+                    if (!BaseGameCounterPreview.TryMultiplayerRank(preview, mainConfig))
+                        Text(preview, "#2 / 8", 4);
                     break;
                 default:
                     preview.CreateText().text = preview.Settings.DisplayName;
