@@ -52,8 +52,8 @@ namespace CountersPlus.UI
                     break;
                 case SpinometerConfigModel spin:
                     Basic(preview, "Spinometer", spin.Mode == SpinometerMode.SplitAverage
-                        ? "<color=#FFB966>720</color> | <color=#FFC57E>840</color>"
-                        : "<color=#FFB966>780</color>");
+                        ? $"<color=#{Spinometer.DetermineColor(720)}>720</color> | <color=#{Spinometer.DetermineColor(840)}>840</color>"
+                        : $"<color=#{Spinometer.DetermineColor(780)}>780</color>");
                     break;
                 case NotesLeftConfigModel left:
                     if (left.LabelAboveCount)

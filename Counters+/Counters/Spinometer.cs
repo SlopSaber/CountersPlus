@@ -90,7 +90,7 @@ namespace CountersPlus.Counters
             }
         }
 
-        private string DetermineColor(float speed)
+        internal static string DetermineColor(float speed)
         {
             ColorUtility.TryParseHtmlString("#FFA500", out Color orange);
             Color color = Color.Lerp(Color.white, orange, speed / 3600);
