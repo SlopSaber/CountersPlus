@@ -20,6 +20,9 @@ namespace CountersPlus.Custom
         
         [JsonProperty(Required = Required.Always)]
         internal string CounterLocation;
+
+        [JsonProperty]
+        internal string PreviewLocation;
         
         [JsonProperty(Required = Required.DisallowNull)]
         internal CustomConfigModel ConfigDefaults = new CustomConfigModel();
@@ -27,6 +30,7 @@ namespace CountersPlus.Custom
         public CustomConfigModel Config;
 
         public Type CounterType;
+        public Type PreviewType;
 
         public class BSMLSettings
         {

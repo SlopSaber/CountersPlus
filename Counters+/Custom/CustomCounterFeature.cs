@@ -43,6 +43,17 @@ namespace CountersPlus.Custom
                     return;
                 }
 
+                if (!string.IsNullOrEmpty(counter.PreviewLocation))
+                {
+                    if (!TryLoadType(ref counter.PreviewType, meta, counter.PreviewLocation)
+                        || counter.PreviewType == null
+                        || !typeof(ICounterPreview).IsAssignableFrom(counter.PreviewType))
+                    {
+                        Plugin.Logger.Warn($"Could not load the preview for {counter.Name}.");
+                        counter.PreviewType = null;
+                    }
+                }
+
                 Plugin.LoadedCustomCounters.Add(counter);
                 Plugin.Logger.Notice($"Loaded a Custom Counter ({counter.Name}).");
             }

@@ -13,7 +13,7 @@ namespace CountersPlus.Counters
     internal class ProgressCounter : Counter<ProgressConfigModel>, ITickable
     {
         private readonly Vector3 ringSize = Vector3.one * 1.175f;
-        private readonly string multiplierImageSpriteName = "Circle";
+        private const string multiplierImageSpriteName = "Circle";
 
         [Inject] private AudioTimeSyncController atsc { get; set; }
         [Inject] private CoreGameHUDController coreGameHUD { get; set; } // For getting multiplier image
@@ -108,7 +108,7 @@ namespace CountersPlus.Counters
             progressRing.fillAmount = (Settings.IncludeRing ? time : atsc.songTime) / length;
         }
 
-        private ImageView CreateRing(Canvas canvas)
+        internal static ImageView CreateRing(Canvas canvas)
         {
             // Unfortunately, there is no guarantee that I have the CoreGameHUDController, since No Text and Huds
             // completely disables it from spawning. So, to be safe, we recreate this all from scratch.

@@ -1,6 +1,7 @@
-﻿using CountersPlus.ConfigModels;
+using CountersPlus.ConfigModels;
 using CountersPlus.Custom;
 using CountersPlus.Utils;
+using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -10,42 +11,72 @@ namespace CountersPlus.UI
 {
     public class MockCounter
     {
-        private Dictionary<ConfigModel, TMP_Text> activeMockCounters = new Dictionary<ConfigModel, TMP_Text>();
+        private readonly Dictionary<ConfigModel, CounterPreviewContext> activePreviews = new Dictionary<ConfigModel, CounterPreviewContext>();
 
         [Inject] private CanvasUtility canvasUtility { get; set; }
+        [Inject] private MainConfigModel mainConfig { get; set; }
+        [Inject] private DiContainer container { get; set; }
 
-        private ConfigModel highlightedConfig = null;
+        private ConfigModel highlightedConfig;
+        private TMP_Text selectionMarker;
 
         public void UpdateMockCounter(ConfigModel settings)
         {
-            if (activeMockCounters.TryGetValue(settings, out TMP_Text old))
+            if (activePreviews.TryGetValue(settings, out CounterPreviewContext old))
             {
-                if (old != null)
-                {
-                    Object.Destroy(old.gameObject);
-                }
-                activeMockCounters.Remove(settings);
+                old.Clear();
+                activePreviews.Remove(settings);
             }
 
-            if (!settings.Enabled) return;
+            if (settings.Enabled)
+            {
+                CounterPreviewContext preview = new CounterPreviewContext(canvasUtility, settings);
+                try
+                {
+                    if (settings is CustomConfigModel custom)
+                    {
+                        Type previewType = custom.AttachedCustomCounter.PreviewType;
+                        if (previewType == null)
+                            preview.CreateText().text = custom.AttachedCustomCounter.Name;
+                        else
+                            ((ICounterPreview)container.Instantiate(previewType)).Render(preview);
+                    }
+                    else
+                        BuiltInCounterPreview.Render(preview, mainConfig);
+                }
+                catch (Exception e)
+                {
+                    Plugin.Logger.Error($"Could not preview {settings.DisplayName}: {e}");
+                    preview.Clear();
+                    preview = new CounterPreviewContext(canvasUtility, settings);
+                    preview.CreateText().text = settings.DisplayName;
+                }
+                activePreviews.Add(settings, preview);
+            }
 
-            TMP_Text @new = canvasUtility.CreateTextFromSettings(settings);
-            @new.text = (settings is CustomConfigModel custom) ? custom.AttachedCustomCounter.Name : settings.DisplayName;
-            @new.color = highlightedConfig == settings ? Color.yellow : Color.white;
-            activeMockCounters.Add(settings, @new);
+            if (highlightedConfig == settings)
+                RefreshSelectionMarker();
         }
 
         public void HighlightCounter(ConfigModel settings)
         {
-            if (highlightedConfig != null && activeMockCounters.TryGetValue(highlightedConfig, out TMP_Text old))
-            {
-                old.color = Color.white;
-            }
             highlightedConfig = settings;
-            if (activeMockCounters.TryGetValue(settings, out TMP_Text highlighted))
-            {
-                highlighted.color = Color.yellow;
-            }
+            RefreshSelectionMarker();
+        }
+
+        private void RefreshSelectionMarker()
+        {
+            if (selectionMarker != null)
+                UnityEngine.Object.Destroy(selectionMarker.gameObject);
+            selectionMarker = null;
+
+            if (highlightedConfig == null || !activePreviews.ContainsKey(highlightedConfig))
+                return;
+
+            selectionMarker = canvasUtility.CreateTextFromSettings(highlightedConfig, new Vector3(-1.4f, 0, 0));
+            selectionMarker.text = "▶";
+            selectionMarker.fontSize = 2;
+            selectionMarker.color = Color.yellow;
         }
     }
 }
