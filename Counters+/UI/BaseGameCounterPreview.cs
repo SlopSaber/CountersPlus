@@ -107,8 +107,9 @@ namespace CountersPlus.UI
 
         internal static bool TryMultiplayerRank(CounterPreviewContext preview, MainConfigModel mainConfig)
         {
-            MultiplayerPositionHUDController source = Resources.FindObjectsOfTypeAll<MultiplayerPositionHUDController>()
-                .FirstOrDefault(controller => controller.gameObject.scene.name == "TutorialGameplay");
+            MultiplayerPositionHUDController[] candidates = Resources.FindObjectsOfTypeAll<MultiplayerPositionHUDController>();
+            MultiplayerPositionHUDController source = candidates.FirstOrDefault(controller => controller.gameObject.scene.name == "TutorialGameplay")
+                ?? candidates.FirstOrDefault(controller => controller.gameObject.scene.IsValid() && controller.gameObject.scene.isLoaded);
             if (source == null) return false;
 
             GameObject holder = CreateHolder(preview);
@@ -123,8 +124,12 @@ namespace CountersPlus.UI
             return true;
         }
 
-        private static CoreGameHUDController FindHUD() => Resources.FindObjectsOfTypeAll<CoreGameHUDController>()
-            .FirstOrDefault(hud => hud.gameObject.scene.name == "TutorialGameplay");
+        private static CoreGameHUDController FindHUD()
+        {
+            CoreGameHUDController[] candidates = Resources.FindObjectsOfTypeAll<CoreGameHUDController>();
+            return candidates.FirstOrDefault(hud => hud.gameObject.scene.name == "TutorialGameplay")
+                ?? candidates.FirstOrDefault(hud => hud.gameObject.scene.IsValid() && hud.gameObject.scene.isLoaded);
+        }
 
         private static GameObject CreateHolder(CounterPreviewContext preview)
         {
