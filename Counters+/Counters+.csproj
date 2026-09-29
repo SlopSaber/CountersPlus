@@ -4,7 +4,7 @@
   <PropertyGroup>
     <ImportBSMTTargets>true</ImportBSMTTargets>
     <BSMTProjectType>BSIPA</BSMTProjectType>
-    <GameDirectory>D:\BSManager\BSInstances\1.45.1</GameDirectory>
+    <GameDirectory>D:\BSManager\BSInstances\1.45.2</GameDirectory>
     <CopyPDB>false</CopyPDB>
     <DisableCopyToGame>false</DisableCopyToGame>
     <TargetFramework>net48</TargetFramework>
@@ -17,7 +17,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <HeckReferencePath Condition="Exists('$(MSBuildProjectDirectory)\..\..\Heck\Heck\bin\Release\net48\Heck.dll')">$(MSBuildProjectDirectory)\..\..\Heck\Heck\bin\Release\net48\Heck.dll</HeckReferencePath>
     <HeckReferencePath Condition="'$(HeckReferencePath)' == ''">$(GameDirectory)\Plugins\Heck.dll</HeckReferencePath>
   </PropertyGroup>
 
