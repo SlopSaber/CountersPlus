@@ -123,6 +123,8 @@ namespace CountersPlus.UI.ViewControllers.Editing
         private void MainConfig_OnConfigChanged()
         {
             mockCounter.UpdateMockCounter(editingConfigModel);
+            if (editingConfigModel is ScoreConfigModel && mainConfig.PBConfig.Enabled && mainConfig.PBConfig.UnderScore)
+                mockCounter.UpdateMockCounter(mainConfig.PBConfig);
         }
 
         private IEnumerator WaitThenDirtyTheFuckingScrollView() // I'm still sad I have to do this.
