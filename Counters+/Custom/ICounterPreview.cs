@@ -13,7 +13,7 @@ namespace CountersPlus.Custom
 
     public sealed class CounterPreviewContext
     {
-        private readonly List<GameObject> objects = new List<GameObject>();
+        private readonly List<UnityEngine.Object> objects = new List<UnityEngine.Object>();
 
         public CanvasUtility CanvasUtility { get; }
         public ConfigModel Settings { get; }
@@ -33,18 +33,18 @@ namespace CountersPlus.Custom
             return text;
         }
 
-        public void Track(GameObject gameObject)
+        public void Track(UnityEngine.Object resource)
         {
-            if (gameObject != null)
-                objects.Add(gameObject);
+            if (resource != null)
+                objects.Add(resource);
         }
 
         internal void Clear()
         {
-            foreach (GameObject gameObject in objects)
+            foreach (UnityEngine.Object resource in objects)
             {
-                if (gameObject != null)
-                    Object.Destroy(gameObject);
+                if (resource != null)
+                    Object.Destroy(resource);
             }
             objects.Clear();
         }
