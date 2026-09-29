@@ -1,5 +1,6 @@
 using CountersPlus.ConfigModels;
 using CountersPlus.Custom;
+using HMUI;
 using System;
 using System.Linq;
 using TMPro;
@@ -146,7 +147,8 @@ namespace CountersPlus.UI
             GameObject clone = UnityEngine.Object.Instantiate(source, parent, false);
             foreach (Behaviour behaviour in clone.GetComponentsInChildren<Behaviour>(true))
             {
-                if (behaviour is TMP_Text || behaviour is Graphic || behaviour is Canvas)
+                if (behaviour is TMP_Text || behaviour is Graphic || behaviour is Canvas ||
+                    behaviour is CanvasGroup || behaviour is CurvedCanvasSettings)
                     continue;
                 behaviour.enabled = false;
             }
