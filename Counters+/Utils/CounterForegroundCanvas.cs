@@ -58,6 +58,14 @@ namespace CountersPlus.Utils
             if (originalMaterials.TryGetValue(source, out original))
                 return source;
             original = source;
+            // TMP fallback materials inherit the parent's foreground settings.
+            // Keep those borrowed materials rather than swapping them back and
+            // forth with TMP's material reference on each text regeneration.
+            if (source.renderQueue == (int)RenderQueue.Overlay &&
+                (!source.HasProperty("_ZTestMode") || source.GetFloat("_ZTestMode") == (float)CompareFunction.Always ||
+                    source.GetFloat("_ZTestMode") == (float)CompareFunction.Disabled) &&
+                (!source.HasProperty("_ZWrite") || source.GetFloat("_ZWrite") == 0f))
+                return source;
             if (foregroundMaterials.TryGetValue(source, out Material material))
                 return material;
 
