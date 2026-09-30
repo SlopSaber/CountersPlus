@@ -11,7 +11,11 @@ namespace CountersPlus.Utils
     internal sealed class CounterForegroundCanvas : MonoBehaviour
     {
         private readonly List<Graphic> graphics = new List<Graphic>();
+        private readonly Dictionary<Material, Material> foregroundMaterials = new Dictionary<Material, Material>();
+        private readonly Dictionary<Material, Material> originalMaterials = new Dictionary<Material, Material>();
         private int foregroundLayer;
+        private bool hierarchyDirty = true;
+        private float nextDiscoveryTime;
 
         private void Awake()
         {
@@ -24,72 +28,124 @@ namespace CountersPlus.Utils
             gameObject.layer = foregroundLayer;
         }
 
+        internal void MarkHierarchyDirty() => hierarchyDirty = true;
+
+        private void OnEnable() => MarkHierarchyDirty();
+
+        private void OnTransformChildrenChanged() => MarkHierarchyDirty();
+
         private void LateUpdate()
         {
-            // Includes counters supplied by other mods and reparented score/rank
-            // text. Reuse the list, and configure each graphic only once.
+            // Direct children and TMP submeshes signal changes. A slow fallback
+            // also discovers graphics added inside third-party nested groups.
+            if (!hierarchyDirty && Time.unscaledTime < nextDiscoveryTime)
+                return;
+            hierarchyDirty = false;
+            nextDiscoveryTime = Time.unscaledTime + 0.5f;
+
             GetComponentsInChildren(true, graphics);
             foreach (Graphic graphic in graphics)
             {
-                graphic.gameObject.layer = foregroundLayer;
+                if (graphic.gameObject.layer != foregroundLayer)
+                    graphic.gameObject.layer = foregroundLayer;
                 if (graphic.GetComponent<CounterForegroundGraphic>() == null)
                     graphic.gameObject.AddComponent<CounterForegroundGraphic>();
             }
+        }
+
+        internal Material GetForegroundMaterial(Material source, out Material original)
+        {
+            if (originalMaterials.TryGetValue(source, out original))
+                return source;
+            original = source;
+            if (foregroundMaterials.TryGetValue(source, out Material material))
+                return material;
+
+            material = new Material(source) { name = source.name + " (Counters+ foreground)" };
+            material.renderQueue = (int)RenderQueue.Overlay;
+            if (material.HasProperty("_ZTestMode"))
+                material.SetFloat("_ZTestMode", (float)CompareFunction.Always);
+            if (material.HasProperty("_ZWrite"))
+                material.SetFloat("_ZWrite", 0f);
+            foregroundMaterials.Add(source, material);
+            originalMaterials.Add(material, source);
+            return material;
+        }
+
+        private void OnDestroy()
+        {
+            foreach (Material material in foregroundMaterials.Values)
+                if (material != null)
+                    Destroy(material);
         }
     }
 
     internal sealed class CounterForegroundGraphic : MonoBehaviour
     {
-        private static readonly int ZTestMode = Shader.PropertyToID("_ZTestMode");
-        private static readonly int ZWrite = Shader.PropertyToID("_ZWrite");
         private Graphic graphic;
+        private CounterForegroundCanvas canvas;
         private Material original;
-        private Material owned;
+        private Material foreground;
+        private bool refreshing;
 
         private void Awake()
         {
             graphic = GetComponent<Graphic>();
+            canvas = GetComponentInParent<CounterForegroundCanvas>();
+            graphic.RegisterDirtyMaterialCallback(RefreshMaterial);
             RefreshMaterial();
         }
 
-        private void LateUpdate() => RefreshMaterial();
+        private void OnTransformChildrenChanged()
+        {
+            if (canvas != null)
+                canvas.MarkHierarchyDirty();
+        }
 
         private void RefreshMaterial()
         {
-            Material source = GetMaterial();
-            if (source == null || source == owned)
+            if (refreshing || canvas == null || graphic == null)
                 return;
-
-            Material previous = owned;
-            original = source;
-            owned = new Material(source) { name = source.name + " (Counters+ foreground)" };
-            owned.renderQueue = (int)RenderQueue.Overlay;
-            if (owned.HasProperty(ZTestMode))
-                owned.SetFloat(ZTestMode, (float)CompareFunction.Always);
-            if (owned.HasProperty(ZWrite))
-                owned.SetFloat(ZWrite, 0f);
-            SetMaterial(owned);
-            if (previous != null)
-                Destroy(previous);
+            Material source = GetMaterial();
+            if (source == null || source == foreground)
+                return;
+            refreshing = true;
+            try
+            {
+                foreground = canvas.GetForegroundMaterial(source, out original);
+                if (source != foreground)
+                    SetMaterial(foreground);
+            }
+            finally
+            {
+                refreshing = false;
+            }
         }
 
         private Material GetMaterial() => graphic is TMP_Text text
-            ? text.fontSharedMaterial : graphic.material;
+            ? text.fontSharedMaterial
+            // TMP_SubMeshUI.material calls GetMaterial(), which dirties vertices
+            // and material on every read. Its shared getter has no side effects.
+            : graphic is TMP_SubMeshUI subMesh ? subMesh.sharedMaterial : graphic.material;
 
         private void SetMaterial(Material material)
         {
             if (graphic is TMP_Text text)
                 text.fontSharedMaterial = material;
+            else if (graphic is TMP_SubMeshUI subMesh)
+                subMesh.sharedMaterial = material;
             else
                 graphic.material = material;
         }
 
         private void OnDestroy()
         {
-            if (graphic != null && GetMaterial() == owned)
-                SetMaterial(original);
-            if (owned != null)
-                Destroy(owned);
+            if (graphic != null)
+            {
+                graphic.UnregisterDirtyMaterialCallback(RefreshMaterial);
+                if (GetMaterial() == foreground)
+                    SetMaterial(original);
+            }
         }
     }
 }
