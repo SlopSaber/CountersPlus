@@ -116,7 +116,8 @@ namespace CountersPlus.Utils
             curvedCanvasSettings.SetRadius(canvasSettings.CurveRadius);
 
             // Inherit canvas properties from the Energy Bar to ignore the shockwave effect.
-            // However, a caveat as that, when viewing through walls, UI elements will not appear.
+            // Keep the Energy Bar's sorting settings; foreground rendering below
+            // handles obstacle occlusion separately.
             if (canvasSettings.IgnoreShockwaveEffect && energyCanvas != null)
             {
                 canvas.overrideSorting = energyCanvas.overrideSorting;
@@ -125,6 +126,9 @@ namespace CountersPlus.Utils
                 canvas.sortingOrder = energyCanvas.sortingOrder;
                 canvas.gameObject.layer = energyCanvas.gameObject.layer;
             }
+
+            if (LayerMask.NameToLayer("ScreenDisplacement") == 17)
+                canvasGameObject.AddComponent<CounterForegroundCanvas>();
 
             return canvas;
         }
