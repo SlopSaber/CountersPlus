@@ -11,7 +11,7 @@ namespace CountersPlus.Installers
     {
         public override void InstallBindings()
         {
-            Container.Bind<VersionUtility>().AsSingle().NonLazy();
+            Container.BindInterfacesAndSelfTo<VersionUtility>().AsSingle().NonLazy();
 
             MainConfigModel mainConfig = Plugin.MainConfig;
 
