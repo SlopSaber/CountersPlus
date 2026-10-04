@@ -1,7 +1,6 @@
 ﻿using CountersPlus.ConfigModels;
 using CountersPlus.Counters.Interfaces;
 using CountersPlus.Counters.NoteCountProcessors;
-using HarmonyLib;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -196,7 +195,7 @@ namespace CountersPlus.Counters
 
         private static bool HasPatchedScoreCalculation()
         {
-            foreach (var method in Harmony.GetAllPatchedMethods())
+            foreach (var method in global::HarmonyLib.Harmony.GetAllPatchedMethods())
             {
                 var type = method.DeclaringType;
                 string name = method.Name;
