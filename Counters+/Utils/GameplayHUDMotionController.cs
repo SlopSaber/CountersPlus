@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using Heck;
 using Heck.Animation;
 using UnityEngine;
@@ -64,7 +66,7 @@ namespace CountersPlus.Utils
             if (sceneData.beatmapKey.characteristic != BeatmapCharacteristic.Degree90 &&
                 sceneData.beatmapKey.characteristic != BeatmapCharacteristic.Degree360)
             {
-                foreach (NoteData noteData in beatmapData.GetBeatmapDataItems<NoteData>(0).OrderBy(note => note.time))
+                foreach (NoteData noteData in OrderNotes(beatmapData.GetBeatmapDataItems<NoteData>(0)))
                 {
                     if (noteData.gameplayType == NoteData.GameplayType.Bomb ||
                         (_laneSamples.Count > 0 && Mathf.Approximately(_laneSamples[_laneSamples.Count - 1].Time, noteData.time)))
@@ -221,6 +223,73 @@ namespace CountersPlus.Utils
             }
 
             return true;
+        }
+
+        private static IEnumerable<NoteData> OrderNotes(IEnumerable<NoteData> source)
+        {
+            if (Thread.CurrentThread.IsThreadPoolThread) return source.OrderBy(note => note.time);
+
+            NoteData[] notes = source.ToArray();
+            if (notes.Length < 128) return notes.OrderBy(note => note.time);
+
+            // Buffer and read sort keys before custom-data callbacks can change note times.
+            var times = new float[notes.Length];
+            for (int index = 0; index < notes.Length; index++) times[index] = notes[index].time;
+
+            Task<int[]> task;
+            if (ExecutionContext.IsFlowSuppressed())
+            {
+                task = QueueNoteOrder(times);
+            }
+            else
+            {
+                using (ExecutionContext.SuppressFlow())
+                {
+                    task = QueueNoteOrder(times);
+                }
+            }
+
+            return OrderedNotes(notes, task.GetAwaiter().GetResult());
+        }
+
+        private static Task<int[]> QueueNoteOrder(float[] times)
+        {
+            return Task.Factory.StartNew(
+                ComputeOwnedNoteOrder,
+                times,
+                CancellationToken.None,
+                TaskCreationOptions.DenyChildAttach,
+                TaskScheduler.Default);
+        }
+
+        private static int[] ComputeOwnedNoteOrder(object state)
+        {
+            var times = (float[])state;
+            var order = new int[times.Length];
+            for (int index = 0; index < order.Length; index++) order[index] = index;
+            Array.Sort(order, new NoteTimeComparer(times));
+            return order;
+        }
+
+        private static IEnumerable<NoteData> OrderedNotes(NoteData[] notes, int[] order)
+        {
+            foreach (int index in order) yield return notes[index];
+        }
+
+        private sealed class NoteTimeComparer : IComparer<int>
+        {
+            private readonly float[] _times;
+
+            internal NoteTimeComparer(float[] times)
+            {
+                _times = times;
+            }
+
+            public int Compare(int first, int second)
+            {
+                int comparison = _times[first].CompareTo(_times[second]);
+                return comparison == 0 ? first.CompareTo(second) : comparison;
+            }
         }
     }
 }
