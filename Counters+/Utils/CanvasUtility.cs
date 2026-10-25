@@ -17,6 +17,7 @@ namespace CountersPlus.Utils
         internal Dictionary<int, Canvas>.ValueCollection Canvases => CanvasIDToCanvas.Values;
         private Canvas energyCanvas = null;
         private MainConfigModel mainConfig;
+        private readonly IGamePause gamePause;
 
         private float hudDepth = 7f;
 
@@ -26,9 +27,11 @@ namespace CountersPlus.Utils
             MainConfigModel mainConfig,
             [InjectOptional] GameplayCoreSceneSetupData data,
             [InjectOptional] CoreGameHUDController coreGameHUD,
-            [InjectOptional] MultiplayerPositionHUDController multiplayerPositionHUD)
+            [InjectOptional] MultiplayerPositionHUDController multiplayerPositionHUD,
+            [InjectOptional] IGamePause gamePause = null)
         {
             this.mainConfig = mainConfig;
+            this.gamePause = gamePause;
             if (coreGameHUD != null)
             {
                 hudDepth = coreGameHUD.GetComponentInChildren<ComboUIController>().transform.position.z;
@@ -128,7 +131,7 @@ namespace CountersPlus.Utils
             }
 
             if (LayerMask.NameToLayer("ScreenDisplacement") == 17)
-                canvasGameObject.AddComponent<CounterForegroundCanvas>();
+                canvasGameObject.AddComponent<CounterForegroundCanvas>().Initialize(gamePause);
 
             return canvas;
         }
