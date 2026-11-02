@@ -22,21 +22,21 @@ namespace CountersPlus.Utils
 
         private IEnumerator GetBeatModsVersion()
         {
-            using (UnityWebRequest www = UnityWebRequest.Get("https://beatmods.com/api/mods/37"))
+            using (UnityWebRequest www = UnityWebRequest.Get("https://beatmods.com/api/v3/mods/37"))
             {
                 www.SetRequestHeader("User-Agent", $"Counters+/{PluginVersion}");
                 yield return www.SendWebRequest();
                 if (www.result != UnityWebRequest.Result.Success)
                 {
-                    Plugin.Logger.Error("Failed to download version info.");
+                    Plugin.Logger.Warn($"Version check unavailable: HTTP {www.responseCode}, {www.error}");
                     yield break;
                 }
                 BeatmodsResult result = JsonConvert.DeserializeObject<BeatmodsResult>(www.downloadHandler.text);
-                foreach (BeatmodsModVersionResult versionResult in result.mod.versions)
+                foreach (BeatmodsModVersionResult versionResult in result.versions)
                 {
                     if (versionResult.status != "verified") continue;
-                    BeatModsVersion = new Version(versionResult.modVersion);
-                    break;
+                    Version version = new Version(versionResult.modVersion);
+                    if (version > BeatModsVersion) BeatModsVersion = version;
                 }
             }
             if (!HasLatestVersion) Plugin.Logger.Warn("Uh oh! We aren't up to date!");
@@ -47,17 +47,12 @@ namespace CountersPlus.Utils
 
     class BeatmodsResult
     {
-        [JsonProperty("mod")] internal BeatmodsModResult mod;
-    }
-
-    class BeatmodsModResult
-    {
         [JsonProperty("versions")] internal BeatmodsModVersionResult[] versions;
     }
 
     class BeatmodsModVersionResult
     {
         [JsonProperty("status")] internal string status;
-        [JsonProperty("modVersion")] internal string modVersion;
+        [JsonProperty("semver")] internal string modVersion;
     }
 }
