@@ -18,7 +18,7 @@ namespace CountersPlus.UI
             if (source == null) return false;
 
             GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform, preview.CanvasUtility.PreviewDepthScale);
+            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
             Position(clone.transform, preview);
             TMP_Text count = clone.GetComponentsInChildren<TMP_Text>(true)
                 .FirstOrDefault(text => text.name.IndexOf("combo", StringComparison.OrdinalIgnoreCase) >= 0 && int.TryParse(text.text, out _))
@@ -36,7 +36,7 @@ namespace CountersPlus.UI
             if (source == null) return false;
 
             GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform, preview.CanvasUtility.PreviewDepthScale);
+            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
             foreach (TMP_Text text in clone.GetComponentsInChildren<TMP_Text>(true))
                 text.enabled = false;
             Position(clone.transform, preview);
@@ -57,7 +57,7 @@ namespace CountersPlus.UI
             if (pointsSource == null || hud.relativeScoreGo == null || hud.immediateRankGo == null) return false;
 
             GameObject holder = CreateHolder(preview);
-            GameObject pointsObject = CloneGraphics(pointsSource.gameObject, holder.transform, preview.CanvasUtility.PreviewDepthScale);
+            GameObject pointsObject = CloneGraphics(pointsSource.gameObject, holder.transform);
             TMP_Text points = pointsObject.GetComponent<TMP_Text>();
             points.text = "567,890";
             float positionScale = preview.CanvasUtility.GetCanvasSettingsFromID(settings.CanvasID).PositionScale;
@@ -65,7 +65,7 @@ namespace CountersPlus.UI
 
             if (settings.Mode != ScoreMode.RankOnly)
             {
-                GameObject relativeObject = CloneGraphics(hud.relativeScoreGo, points.transform, preview.CanvasUtility.PreviewDepthScale);
+                GameObject relativeObject = CloneGraphics(hud.relativeScoreGo, points.transform);
                 relativeObject.transform.localPosition = pointsSource.transform.InverseTransformPoint(hud.relativeScoreGo.transform.position);
                 TMP_Text relative = relativeObject.GetComponent<TMP_Text>();
                 if (relative != null)
@@ -77,7 +77,7 @@ namespace CountersPlus.UI
 
             if (settings.Mode != ScoreMode.ScoreOnly)
             {
-                GameObject rankObject = CloneGraphics(hud.immediateRankGo, points.transform, preview.CanvasUtility.PreviewDepthScale);
+                GameObject rankObject = CloneGraphics(hud.immediateRankGo, points.transform);
                 rankObject.transform.localPosition = pointsSource.transform.InverseTransformPoint(hud.immediateRankGo.transform.position);
                 TMP_Text rank = rankObject.GetComponent<TMP_Text>();
                 if (rank != null)
@@ -100,7 +100,7 @@ namespace CountersPlus.UI
             if (source == null) return false;
 
             GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform, preview.CanvasUtility.PreviewDepthScale);
+            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
             Position(clone.transform, preview, new Vector3(0, -0.25f, 0));
             holder.SetActive(true);
             return true;
@@ -114,7 +114,7 @@ namespace CountersPlus.UI
             if (source == null) return false;
 
             GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform, preview.CanvasUtility.PreviewDepthScale);
+            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
             Position(clone.transform, preview, new Vector3(0, -0.25f, 0));
             if (!mainConfig.ItalicText)
             {
@@ -142,10 +142,10 @@ namespace CountersPlus.UI
             return holder;
         }
 
-        private static GameObject CloneGraphics(GameObject source, Transform parent, float worldScale = 1f)
+        private static GameObject CloneGraphics(GameObject source, Transform parent)
         {
             GameObject clone = UnityEngine.Object.Instantiate(source, parent, false);
-            clone.transform.localScale = Divide(source.transform.lossyScale * worldScale, parent.lossyScale);
+            clone.transform.localScale = Divide(source.transform.lossyScale, parent.lossyScale);
             foreach (Behaviour behaviour in clone.GetComponentsInChildren<Behaviour>(true))
             {
                 if (behaviour is TMP_Text || behaviour is Graphic || behaviour is Canvas ||

@@ -1,4 +1,4 @@
-﻿<bg anchor-pos-y="-20" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+﻿<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <horizontal child-align="MiddleCenter" spacing="3">
     <page-button id="left-button" click-event="list#PageUp" direction="Left"/>
     <custom-list size-delta-y="25" id="list" list-direction="Horizontal" visible-cells="5" select-cell="option-selected" cell-size="20">
@@ -21,6 +21,19 @@
 
     </custom-list>
     <page-button id="right-button" click-event="list#PageDown" direction="Right"/>
-    <page-button id="expand-button" direction="Down" on-click="toggle-grid" hover-hint="Show all counters"/>
+  </horizontal>
+
+  <!--Playlist-style flyout with every entry-->
+  <vertical id='flyout' bg='round-rect-panel' ignore-layout='true' active='false'
+            anchor-min-x='0.5' anchor-max-x='0.5' anchor-min-y='0.5' anchor-max-y='0.5' pivot-x='0.5' pivot-y='0' anchor-pos-y='-12.5'
+            size-delta-x='122' size-delta-y='26' pad='2' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'
+            child-control-height='false' child-control-width='false' child-align='LowerCenter'>
+    <grid id='flyout-grid' cell-size-x='20' cell-size-y='20' spacing-x='2' spacing-y='2' child-align='LowerCenter'/>
+  </vertical>
+
+  <!--Flyout toggle beneath the strip, like the base game's playlist expander-->
+  <horizontal ignore-layout='true' anchor-min-x='0.5' anchor-max-x='0.5' anchor-min-y='0.5' anchor-max-y='0.5'
+              anchor-pos-y='-15' size-delta-x='20' size-delta-y='6'>
+    <page-button id='expand-button' direction='Down' pref-width='14' pref-height='5' on-click='toggle-flyout' hover-hint='Show all counters'/>
   </horizontal>
 </bg>

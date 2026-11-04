@@ -43,7 +43,6 @@ namespace CountersPlus.Installers
             BindViewController<CountersPlusBlankViewController>();
             BindViewController<CountersPlusSettingSectionSelectionViewController>();
             BindViewController<CountersPlusCounterEditViewController>();
-            BindViewController<CountersPlusCounterGridViewController>();
             BindViewController<CountersPlusHUDListViewController>();
             BindViewController<CountersPlusHUDEditViewController>();
 

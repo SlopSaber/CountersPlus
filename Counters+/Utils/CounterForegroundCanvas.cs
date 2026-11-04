@@ -18,6 +18,7 @@ namespace CountersPlus.Utils
         private int uiLayer;
         private IGamePause gamePause;
         private bool paused;
+        private bool preview;
         private bool hierarchyDirty = true;
         private float nextDiscoveryTime;
 
@@ -33,9 +34,11 @@ namespace CountersPlus.Utils
             gameObject.layer = foregroundLayer;
         }
 
-        internal void Initialize(IGamePause pause)
+        internal void Initialize(IGamePause pause, bool isPreview = false)
         {
             if (foregroundLayer < 0 || uiLayer < 0) return;
+            preview = isPreview;
+            if (preview) gameObject.layer = uiLayer;
             if (gamePause != null)
             {
                 gamePause.didPauseEvent -= HandlePaused;
@@ -86,7 +89,7 @@ namespace CountersPlus.Utils
         {
             hierarchyDirty = false;
             nextDiscoveryTime = Time.unscaledTime + 0.5f;
-            int layer = paused ? uiLayer : foregroundLayer;
+            int layer = paused || preview ? uiLayer : foregroundLayer;
             if (gameObject.layer != layer)
                 gameObject.layer = layer;
 
@@ -106,21 +109,22 @@ namespace CountersPlus.Utils
                 source = basis;
             original = source;
             // Paused HUD returns to the UI pass before the menu's transparent graphics.
-            int queue = paused ? (int)RenderQueue.Transparent - 1 : (int)RenderQueue.Overlay;
-            CompareFunction depthTest = paused ? CompareFunction.LessEqual : CompareFunction.Always;
+            // Menu previews draw over the environment but beneath every transparent menu screen.
+            int queue = paused || preview ? (int)RenderQueue.Transparent - 1 : (int)RenderQueue.Overlay;
+            CompareFunction depthTest = paused && !preview ? CompareFunction.LessEqual : CompareFunction.Always;
             // TMP fallback materials inherit the parent's foreground settings.
             // Keep those borrowed materials rather than swapping them back and
             // forth with TMP's material reference on each text regeneration.
             if (source.renderQueue == queue &&
                 (!source.HasProperty("_ZTestMode") || source.GetFloat("_ZTestMode") == (float)depthTest ||
-                    (!paused && source.GetFloat("_ZTestMode") == (float)CompareFunction.Disabled)) &&
+                    (depthTest == CompareFunction.Always && source.GetFloat("_ZTestMode") == (float)CompareFunction.Disabled)) &&
                 (!source.HasProperty("_ZWrite") || source.GetFloat("_ZWrite") == 0f))
                 return source;
-            var materials = paused ? pausedMaterials : foregroundMaterials;
+            var materials = paused && !preview ? pausedMaterials : foregroundMaterials;
             if (materials.TryGetValue(source, out Material material))
                 return material;
 
-            material = new Material(source) { name = source.name + (paused ? " (Counters+ paused)" : " (Counters+ foreground)") };
+            material = new Material(source) { name = source.name + (paused && !preview ? " (Counters+ paused)" : preview ? " (Counters+ preview)" : " (Counters+ foreground)") };
             material.renderQueue = queue;
             if (material.HasProperty("_ZTestMode"))
                 material.SetFloat("_ZTestMode", (float)depthTest);

@@ -1,27 +1,23 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <vertical spacing='1' pad-top='1' pad-bottom='1' child-control-height='true' child-expand-height='false' vertical-fit='Unconstrained'>
+  <vertical spacing='1' pad-top='1' child-control-height='true' child-expand-height='false' vertical-fit='Unconstrained'>
 
     <!--Compact credits-->
-    <horizontal bg='round-rect-panel' pad='2' spacing='2' pref-width='100' pref-height='17' child-expand-width='false'>
-      <vertical spacing='0' pref-width='58' child-expand-height='false' child-align='MiddleLeft'>
-        <text id='aprilFoolsText' align='Left' font-size='3.5' text='April fools!'/>
-        <text id='creatorText' align='Left' font-size='4' text='Developed by Caeden117'/>
-        <text id='versionText' align='Left' font-size='3' text='Version 0.0.0'/>
-        <text id='updateText' align='Left' font-size='2.5' text='Version 0.0.0 available for download!'/>
-        <text id='linkOpenedText' align='Left' font-size='2.5' text='Link opened in your browser!'/>
-      </vertical>
-      <vertical spacing='0.5' pref-width='34' child-expand-height='false'>
-        <button id='github' text='GitHub' pref-width='34' pref-height='5'/>
-        <button id='donate' text='Donate' pref-width='34' pref-height='5'/>
-        <button id='issues' text='Report an Issue' pref-width='34' pref-height='5'/>
-      </vertical>
-    </horizontal>
+    <vertical bg='round-rect-panel' pref-width='100' pad='1.5' spacing='0.5' child-expand-height='false'>
+      <horizontal spacing='3' child-expand-width='false' child-align='MiddleCenter'>
+        <text id='creatorText' align='Center' font-size='3.5' text='Developed by Caeden117'/>
+        <text id='versionText' align='Center' font-size='3' text='Version 0.0.0'/>
+      </horizontal>
+      <text id='aprilFoolsText' align='Center' font-size='3' text='April fools!'/>
+      <text id='updateText' align='Center' font-size='2.5' text='Version 0.0.0 available for download!'/>
+      <text id='linkOpenedText' align='Center' font-size='2.5' text='Link opened in your browser!'/>
+      <horizontal spacing='1' child-expand-width='false' child-align='MiddleCenter'>
+        <button id='github' text='GitHub' pref-width='30' pref-height='6'/>
+        <button id='donate' text='Donate' pref-width='30' pref-height='6'/>
+        <button id='issues' text='Report an Issue' pref-width='34' pref-height='6'/>
+      </horizontal>
+    </vertical>
 
     <!--Main settings-->
-    <vertical bg='round-rect-panel' pref-width='100' pref-height='58' child-control-height='true' child-expand-height='true'>
-      <scroll-view>
-        <vertical id='main-settings' pad-left='3' pad-right='3' pad-top='1' spacing='0' vertical-fit='PreferredSize'/>
-      </scroll-view>
-    </vertical>
+    <vertical id='main-settings' bg='round-rect-panel' pref-width='100' pad-left='3' pad-right='3' pad-top='1' pad-bottom='1' child-expand-height='false'/>
   </vertical>
 </bg>
