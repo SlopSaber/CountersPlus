@@ -32,16 +32,14 @@ namespace CountersPlus.ConfigModels
         public virtual int CanvasID { get; set; } = -1;
 
         #region UI
-        [UIValue(nameof(Distances))]
-        public List<object> Distances => AllDistances.Cast<object>().ToList();
+        [UIAction(nameof(DistanceFormat))]
+        public string DistanceFormat(float distance) => distance.ToString("0.00");
 
         [UIValue(nameof(Positions))]
         public List<object> Positions => PositionToNames.Keys.Cast<object>().ToList();
 
         [UIAction(nameof(PositionsFormat))]
         public string PositionsFormat(CounterPositions pos) => PositionToNames[pos];
-
-        private static List<float> AllDistances = Enumerable.Range(-40, 81).Select(x => x * 0.25f).ToList();
 
         private static Dictionary<CounterPositions, string> PositionToNames = new Dictionary<CounterPositions, string>()
         {
