@@ -4,7 +4,7 @@
   <!--Custom Counter multiplayer warning-->
   <vertical spacing='0.5' tags='multiplayer-warning'>
     <text align='Center' text='Warning!' color='#FF7F7F'/>
-    <text align='Center' text='This custom counter is not marked as Multiplayer ready, and will not load in Multiplayer.'/>
+    <text align='Center' word-wrapping='true' pref-width='88' text='This custom counter is not marked as Multiplayer ready, and will not load in Multiplayer.'/>
   </vertical>
 
   <checkbox-setting text='Enabled' apply-on-change='true' value='Enabled' hover-hint='Toggle this counter on or off.' on-change='fire-update'/>

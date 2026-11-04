@@ -40,6 +40,7 @@ namespace CountersPlus.UI.ViewControllers.Editing
             }
             ClearScreen();
             var param = BSMLParser.Instance.Parse(SettingsBase, gameObject, settings);
+            ScrollViewUtility.FitContentToViewportWidth(GetComponentsInChildren<BeatSaberMarkupLanguage.Components.BSMLScrollView>(true).LastOrDefault());
             currentlyEditing = settings;
             currentlyEditing.OnCanvasSettingsChanged += CurrentlyEditing_OnCanvasSettingsChanged;
             currentlyEditing.OnCanvasSettingsApply += CurrentlyEditing_OnCanvasSettingsApply;

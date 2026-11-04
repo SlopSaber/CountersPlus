@@ -1,6 +1,5 @@
 ﻿<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal child-align="MiddleCenter" spacing="3">
-    <page-button id="left-button" click-event="list#PageUp" direction="Left"/>
+  <horizontal child-align="MiddleCenter">
     <custom-list size-delta-y="22" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="18">
 
       <!--Cell Template-->
@@ -20,7 +19,6 @@
       </bg>
 
     </custom-list>
-    <page-button id="right-button" click-event="list#PageDown" direction="Right"/>
   </horizontal>
 
   <!--Playlist-style flyout with every entry, positioned and animated from code-->

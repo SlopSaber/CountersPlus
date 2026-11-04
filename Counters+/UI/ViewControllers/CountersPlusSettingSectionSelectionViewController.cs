@@ -19,23 +19,25 @@ namespace CountersPlus.UI.ViewControllers
         private const float CellSize = 18f;
         private const float Padding = 2f;
         private const float AnimationSeconds = 0.15f;
+        private const float CloseDelaySeconds = 0.12f;
         private static readonly Color SelectedColor = new Color(0f, 0.75f, 1f);
 
         [Inject] private CounterCatalog catalog { get; set; }
 
         [UIComponent("list")] private CustomCellListTableData tableList { get; set; }
-        [UIComponent("left-button")] private Button leftButton { get; set; }
-        [UIComponent("right-button")] private Button rightButton { get; set; }
         [UIObject("flyout")] private GameObject flyout { get; set; }
         [UIComponent("flyout-grid")] private GridLayoutGroup flyoutGrid { get; set; }
 
         private readonly List<FlyoutCell> flyoutCells = new List<FlyoutCell>();
-        private ScrollView scrollView;
         private RectTransform flyoutRect;
         private RectTransform gridRect;
         private bool expanded;
         private bool suppressHoverUntilExit;
         private Coroutine animation;
+        private PointerEventData flyoutPointer;
+        private PointerEventData stripPointer;
+        private float lastHoveredTime;
+        private TMPro.TMP_Text hoverLabel;
         private float openTop, openBottom, rowTop, rowBottom;
 
         public override string ResourceName => "CountersPlus.UI.BSML.SettingsSectionSelection.bsml";
@@ -43,9 +45,6 @@ namespace CountersPlus.UI.ViewControllers
         protected override void DidActivate(bool firstActivation, bool addedToHierarchy, bool screenSystemEnabling)
         {
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
-
-            scrollView = tableList.TableView.scrollView;
-            scrollView.scrollPositionChangedEvent += ScrollView_scrollPositionChangedEvent;
 
             if (firstActivation) SetupFlyout();
             if (addedToHierarchy) catalog.ClearSelection();
@@ -57,17 +56,7 @@ namespace CountersPlus.UI.ViewControllers
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            scrollView.scrollPositionChangedEvent -= ScrollView_scrollPositionChangedEvent;
             Collapse(false);
-        }
-
-        [UIAction("#post-parse")]
-        private void Parsed()
-        {
-            var colors = rightButton.colors;
-            colors.disabledColor = Color.black;
-            rightButton.colors = colors;
-            leftButton.colors = colors;
         }
 
         private void SetupFlyout()
@@ -77,10 +66,17 @@ namespace CountersPlus.UI.ViewControllers
             flyoutRect.pivot = new Vector2(0.5f, 1f);
             flyoutRect.sizeDelta = new Vector2(Columns * CellSize + Padding * 2, CellSize + Padding * 2);
             flyout.AddComponent<RectMask2D>();
-            flyout.AddComponent<HoverRelay>().Exited = () =>
-            {
-                if (expanded) Collapse(true);
-            };
+            // The panel stays as an invisible hover target so gaps between icons do not close the flyout.
+            if (flyout.TryGetComponent(out Image panel)) panel.color = Color.clear;
+            flyout.AddComponent<HoverRelay>().Entered = data => flyoutPointer = data;
+
+            var center = new Vector2(0.5f, 0.5f);
+            hoverLabel = BeatSaberUI.CreateCurvedUIText((RectTransform)flyout.transform.parent, string.Empty,
+                center, center, Vector2.zero, new Vector2(60, 6));
+            hoverLabel.alignment = TMPro.TextAlignmentOptions.Bottom;
+            hoverLabel.fontSize = 4f;
+            hoverLabel.raycastTarget = false;
+            hoverLabel.gameObject.SetActive(false);
 
             gridRect = (RectTransform)flyoutGrid.transform;
             gridRect.anchorMin = gridRect.anchorMax = new Vector2(0.5f, 1f);
@@ -88,12 +84,38 @@ namespace CountersPlus.UI.ViewControllers
             flyoutGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             flyoutGrid.constraintCount = Columns;
 
-            var strip = tableList.gameObject.AddComponent<HoverRelay>();
-            strip.Entered = () =>
+            tableList.gameObject.AddComponent<HoverRelay>().Entered = data =>
             {
+                stripPointer = data;
                 if (!suppressHoverUntilExit && !expanded) Expand();
             };
-            strip.Exited = () => suppressHoverUntilExit = false;
+        }
+
+        // Pointer exit events are not reliable between nested graphics with the VR input module, so hover is
+        // read back from the pointer that entered.
+        private void Update()
+        {
+            if (suppressHoverUntilExit && !IsHovering(stripPointer, tableList.gameObject))
+                suppressHoverUntilExit = false;
+
+            if (!expanded) return;
+            if (IsHovering(flyoutPointer, flyout) || IsHovering(stripPointer, tableList.gameObject))
+            {
+                lastHoveredTime = Time.unscaledTime;
+                return;
+            }
+            if (Time.unscaledTime - lastHoveredTime > CloseDelaySeconds)
+                Collapse(true);
+        }
+
+        private static bool IsHovering(PointerEventData pointer, GameObject target)
+            => pointer != null && target != null && pointer.hovered.Contains(target);
+
+        private void ShowHoverLabel(string text)
+        {
+            if (!expanded) return;
+            hoverLabel.text = text;
+            hoverLabel.gameObject.SetActive(!string.IsNullOrEmpty(text));
         }
 
         private void ReloadCells()
@@ -114,7 +136,6 @@ namespace CountersPlus.UI.ViewControllers
                 tableList.TableView.ClearSelection();
                 tableList.TableView.ScrollToCellWithIdx(0, TableView.ScrollPositionType.Beginning, false);
             }
-            ScrollView_scrollPositionChangedEvent(0f);
             RebuildFlyout(items);
         }
 
@@ -127,10 +148,12 @@ namespace CountersPlus.UI.ViewControllers
             for (int i = 0; i < items.Count; i++)
             {
                 var cell = new FlyoutCell(i, this);
-                string hint = System.Security.SecurityElement.Escape(items[i].Text ?? string.Empty);
-                BSMLParser.Instance.Parse($"<clickable-image id='icon' preserve-aspect='true' on-click='clicked' hover-hint='{hint}'/>",
+                BSMLParser.Instance.Parse("<clickable-image id='icon' preserve-aspect='true' on-click='clicked'/>",
                     flyoutGrid.gameObject, cell);
                 cell.Apply((CountersPlusListTableCell)items[i]);
+                string name = items[i].Text;
+                cell.Icon.PointerEnterEvent += _ => ShowHoverLabel(name);
+                cell.Icon.PointerExitEvent += _ => ShowHoverLabel(null);
                 flyoutCells.Add(cell);
             }
             RefreshFlyoutSelection();
@@ -140,12 +163,6 @@ namespace CountersPlus.UI.ViewControllers
         {
             foreach (FlyoutCell cell in flyoutCells)
                 cell.SetSelected(cell.Index == catalog.SelectedIndex);
-        }
-
-        private void ScrollView_scrollPositionChangedEvent(float _)
-        {
-            leftButton.interactable = scrollView._destinationPos > 0.001f;
-            rightButton.interactable = scrollView._destinationPos < scrollView.contentSize - scrollView.scrollPageSize - 0.001f;
         }
 
         [UIAction("option-selected")]
@@ -185,9 +202,13 @@ namespace CountersPlus.UI.ViewControllers
             openTop = rowTop + anchorRow * CellSize;
             openBottom = rowBottom - (rows - 1 - anchorRow) * CellSize;
             flyoutRect.anchoredPosition = new Vector2(stripCenter.x, rowTop);
+            hoverLabel.rectTransform.anchoredPosition = new Vector2(stripCenter.x, openTop + 3f);
+            hoverLabel.gameObject.SetActive(false);
+            lastHoveredTime = Time.unscaledTime;
 
             flyout.SetActive(true);
             flyout.transform.SetAsLastSibling();
+            hoverLabel.transform.SetAsLastSibling();
             Animate(1f);
         }
 
@@ -195,6 +216,7 @@ namespace CountersPlus.UI.ViewControllers
         {
             expanded = false;
             if (flyoutRect == null) return;
+            hoverLabel.gameObject.SetActive(false);
             if (animated && isActiveAndEnabled && flyout.activeSelf)
             {
                 Animate(0f);
@@ -251,17 +273,11 @@ namespace CountersPlus.UI.ViewControllers
             gridRect.anchoredPosition = new Vector2(0, (openTop - Padding) - top);
         }
 
-        private sealed class HoverRelay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+        private sealed class HoverRelay : MonoBehaviour, IPointerEnterHandler
         {
-            public Action Entered;
-            public Action Exited;
+            public Action<PointerEventData> Entered;
 
-            public void OnPointerEnter(PointerEventData eventData) => Entered?.Invoke();
-
-            public void OnPointerExit(PointerEventData eventData)
-            {
-                if (eventData.fullyExited) Exited?.Invoke();
-            }
+            public void OnPointerEnter(PointerEventData eventData) => Entered?.Invoke(eventData);
         }
 
         private class FlyoutCell

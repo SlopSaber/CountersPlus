@@ -1,4 +1,4 @@
-﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <vertical spacing='1' pad-top='1' child-control-height='true' child-expand-height='false' vertical-fit='Unconstrained'>
 
     <!--Compact credits-->
@@ -11,9 +11,9 @@
       <text id='updateText' align='Center' font-size='2.5' text='Version 0.0.0 available for download!'/>
       <text id='linkOpenedText' align='Center' font-size='2.5' text='Link opened in your browser!'/>
       <horizontal spacing='1' child-expand-width='false' child-align='MiddleCenter'>
-        <button id='github' text='GitHub' pref-width='30' pref-height='6'/>
-        <button id='donate' text='Donate' pref-width='30' pref-height='6'/>
-        <button id='issues' text='Report an Issue' pref-width='34' pref-height='6'/>
+        <button id='github' text='GitHub' pref-width='30' pref-height='9'/>
+        <button id='donate' text='Donate' pref-width='30' pref-height='9'/>
+        <button id='issues' text='Report an Issue' pref-width='34' pref-height='9'/>
       </horizontal>
     </vertical>
 

@@ -14,7 +14,7 @@
         pivot-x='.5' pivot-y='1'>
     <scroll-view id='ScrollContent'>
       <!--Actual content goes inside this 'body' object-->
-      <vertical id='body' pad='5' vertical-fit='PreferredSize' spacing='1'/>
+      <vertical id='body' pad='3' vertical-fit='PreferredSize' horizontal-fit='Unconstrained' spacing='1'/>
     </scroll-view>
   </bg>
 </bg>

@@ -130,6 +130,7 @@ namespace CountersPlus.UI.ViewControllers.Editing
         private IEnumerator WaitThenDirtyTheFuckingScrollView() // I'm still sad I have to do this.
         {
             yield return new WaitUntil(() => scrollView != null);
+            ScrollViewUtility.FitContentToViewportWidth(scrollView);
             scrollView.gameObject.SetActive(false);
             yield return new WaitForEndOfFrame();
             scrollView.gameObject.SetActive(true);
