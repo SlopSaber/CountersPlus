@@ -16,7 +16,10 @@ namespace CountersPlus.UI.ViewControllers
     public class CountersPlusSettingSectionSelectionViewController : BSMLResourceViewController
     {
         private const int Columns = 7;
-        private const float CellSize = 18f;
+        // 0.75x of the strip's 18-unit cells, with a gap so icon artwork does not touch.
+        private const float IconSize = 12f;
+        private const float IconSpacing = 1.5f;
+        private const float RowPitch = IconSize + IconSpacing;
         private const float Padding = 2f;
         private const float AnimationSeconds = 0.15f;
         private const float CloseDelaySeconds = 0.12f;
@@ -38,6 +41,7 @@ namespace CountersPlus.UI.ViewControllers
         private PointerEventData stripPointer;
         private float lastHoveredTime;
         private TMPro.TMP_Text hoverLabel;
+        private CanvasGroup stripGroup;
         private float openTop, openBottom, rowTop, rowBottom;
 
         public override string ResourceName => "CountersPlus.UI.BSML.SettingsSectionSelection.bsml";
@@ -64,7 +68,7 @@ namespace CountersPlus.UI.ViewControllers
             flyoutRect = (RectTransform)flyout.transform;
             flyoutRect.anchorMin = flyoutRect.anchorMax = new Vector2(0.5f, 0.5f);
             flyoutRect.pivot = new Vector2(0.5f, 1f);
-            flyoutRect.sizeDelta = new Vector2(Columns * CellSize + Padding * 2, CellSize + Padding * 2);
+            flyoutRect.sizeDelta = new Vector2(Columns * IconSize + (Columns - 1) * IconSpacing + Padding * 2, IconSize + Padding * 2);
             flyout.AddComponent<RectMask2D>();
             // The panel stays as an invisible hover target so gaps between icons do not close the flyout.
             if (flyout.TryGetComponent(out Image panel)) panel.color = Color.clear;
@@ -81,9 +85,12 @@ namespace CountersPlus.UI.ViewControllers
             gridRect = (RectTransform)flyoutGrid.transform;
             gridRect.anchorMin = gridRect.anchorMax = new Vector2(0.5f, 1f);
             gridRect.pivot = new Vector2(0.5f, 1f);
+            flyoutGrid.cellSize = new Vector2(IconSize, IconSize);
+            flyoutGrid.spacing = new Vector2(IconSpacing, IconSpacing);
             flyoutGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             flyoutGrid.constraintCount = Columns;
 
+            stripGroup = tableList.gameObject.AddComponent<CanvasGroup>();
             tableList.gameObject.AddComponent<HoverRelay>().Entered = data =>
             {
                 stripPointer = data;
@@ -197,10 +204,10 @@ namespace CountersPlus.UI.ViewControllers
             var parent = (RectTransform)flyoutRect.parent;
             Vector3 stripCenter = parent.InverseTransformPoint(listRect.TransformPoint(listRect.rect.center));
 
-            rowTop = stripCenter.y + CellSize / 2 + Padding;
-            rowBottom = stripCenter.y - CellSize / 2 - Padding;
-            openTop = rowTop + anchorRow * CellSize;
-            openBottom = rowBottom - (rows - 1 - anchorRow) * CellSize;
+            rowTop = stripCenter.y + IconSize / 2 + Padding;
+            rowBottom = stripCenter.y - IconSize / 2 - Padding;
+            openTop = rowTop + anchorRow * RowPitch;
+            openBottom = rowBottom - (rows - 1 - anchorRow) * RowPitch;
             flyoutRect.anchoredPosition = new Vector2(stripCenter.x, rowTop);
             hoverLabel.rectTransform.anchoredPosition = new Vector2(stripCenter.x, openTop + 3f);
             hoverLabel.gameObject.SetActive(false);
@@ -224,6 +231,7 @@ namespace CountersPlus.UI.ViewControllers
             }
             StopAnimation();
             openAmount = 0f;
+            stripGroup.alpha = 1f;
             flyout.SetActive(false);
         }
 
@@ -265,6 +273,8 @@ namespace CountersPlus.UI.ViewControllers
         private void ApplyOpenAmount(float amount)
         {
             openAmount = amount;
+            // The strip row is covered by the flyout's anchored row, so it fades out rather than showing through.
+            stripGroup.alpha = 1f - amount;
             float top = Mathf.Lerp(rowTop, openTop, amount);
             float bottom = Mathf.Lerp(rowBottom, openBottom, amount);
             flyoutRect.anchoredPosition = new Vector2(flyoutRect.anchoredPosition.x, top);

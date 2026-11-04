@@ -1,4 +1,4 @@
-﻿<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <horizontal child-align="MiddleCenter">
     <custom-list size-delta-y="22" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="18">
 
@@ -23,6 +23,6 @@
 
   <!--Playlist-style flyout with every entry, positioned and animated from code-->
   <bg id='flyout' bg='round-rect-panel' active='false'>
-    <grid id='flyout-grid' cell-size-x='18' cell-size-y='18' spacing-x='0' spacing-y='0' child-align='UpperCenter'/>
+    <grid id='flyout-grid' cell-size-x='12' cell-size-y='12' spacing-x='1.5' spacing-y='1.5' child-align='UpperCenter'/>
   </bg>
 </bg>
