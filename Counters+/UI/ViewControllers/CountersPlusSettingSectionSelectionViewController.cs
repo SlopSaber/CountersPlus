@@ -359,7 +359,8 @@ namespace CountersPlus.UI.ViewControllers
                 glow.raycastTarget = false;
                 baseColor = info.IsAccent ? CountersPlusListTableCell.AccentColor : Color.white;
                 Icon.DefaultColor = baseColor;
-                Icon.HighlightColor = Color.Lerp(baseColor, Color.white, 0.5f);
+                // Darkened while hovered so the name drawn over it stays readable.
+                Icon.HighlightColor = new Color(baseColor.r * 0.35f, baseColor.g * 0.35f, baseColor.b * 0.35f, 1f);
                 Refresh();
             }
 
