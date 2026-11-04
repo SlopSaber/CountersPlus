@@ -7,7 +7,7 @@
   </vertical>
   
   <!--Content-->
-  <bg anchor-min-x='0' anchor-min-y='-0.35'
+  <bg anchor-min-x='0' anchor-min-y='-0.15'
         anchor-max-x='1' anchor-max-y='0.87'
         anchor-pos-x='0' anchor-pos-y='0'
         size-delta-x='-5' size-delta-y='-5'
