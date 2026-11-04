@@ -1,21 +1,21 @@
 <bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <horizontal child-align="MiddleCenter">
-    <custom-list size-delta-y="22" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="18">
+    <custom-list size-delta-y="16.5" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="13.5">
 
       <!--Cell Template-->
       <bg tags="hovered">
-        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' img-color='#808080' preserve-aspect='true'/>
-        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='24.5' size-delta-y='24.5' preserve-aspect='true'/>
-        <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center'/>
+        <image tags='coverImage' size-delta-x='12' size-delta-y='12' img-color='#808080' preserve-aspect='true'/>
+        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='18.5' size-delta-y='18.5' preserve-aspect='true'/>
+        <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center' font-size='3'/>
       </bg>
       <bg tags="selected">
-        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' img-color='#808000' preserve-aspect='true'/>
-        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='24.5' size-delta-y='24.5' img-color='#00C0FF' preserve-aspect='true'/>
-        <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center'/>
+        <image tags='coverImage' size-delta-x='12' size-delta-y='12' img-color='#808000' preserve-aspect='true'/>
+        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='18.5' size-delta-y='18.5' img-color='#00C0FF' preserve-aspect='true'/>
+        <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center' font-size='3'/>
       </bg>
       <bg tags="un-selected-un-hovered">
-        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' preserve-aspect='true'/>
-        <text tags='accentText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' anchor-pos-y='-10' align='Center' font-size='3'/>
+        <image tags='coverImage' size-delta-x='12' size-delta-y='12' preserve-aspect='true'/>
+        <text tags='accentText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' anchor-pos-y='-7.5' align='Center' font-size='2.5'/>
       </bg>
 
     </custom-list>

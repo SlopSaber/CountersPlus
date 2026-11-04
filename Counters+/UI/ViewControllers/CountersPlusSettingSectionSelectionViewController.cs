@@ -41,6 +41,7 @@ namespace CountersPlus.UI.ViewControllers
         private PointerEventData stripPointer;
         private float lastHoveredTime;
         private TMPro.TMP_Text hoverLabel;
+        private ClickableImage hoveredIcon;
         private CanvasGroup stripGroup;
         private float openTop, openBottom, rowTop, rowBottom;
 
@@ -76,9 +77,11 @@ namespace CountersPlus.UI.ViewControllers
 
             var center = new Vector2(0.5f, 0.5f);
             hoverLabel = BeatSaberUI.CreateCurvedUIText((RectTransform)flyout.transform.parent, string.Empty,
-                center, center, Vector2.zero, new Vector2(60, 6));
-            hoverLabel.alignment = TMPro.TextAlignmentOptions.Bottom;
-            hoverLabel.fontSize = 4f;
+                center, center, Vector2.zero, new Vector2(30, 6));
+            hoverLabel.alignment = TMPro.TextAlignmentOptions.Center;
+            hoverLabel.textWrappingMode = TMPro.TextWrappingModes.NoWrap;
+            hoverLabel.overflowMode = TMPro.TextOverflowModes.Overflow;
+            hoverLabel.fontSize = 3f;
             hoverLabel.raycastTarget = false;
             hoverLabel.gameObject.SetActive(false);
 
@@ -118,11 +121,24 @@ namespace CountersPlus.UI.ViewControllers
         private static bool IsHovering(PointerEventData pointer, GameObject target)
             => pointer != null && target != null && pointer.hovered.Contains(target);
 
-        private void ShowHoverLabel(string text)
+        // Flat replacement for hover hints: the name is drawn over the hovered icon, like the strip's own cells.
+        private void ShowHoverLabel(ClickableImage icon, string text)
         {
             if (!expanded) return;
+            hoveredIcon = icon;
+            var parent = (RectTransform)hoverLabel.transform.parent;
+            Vector3 center = parent.InverseTransformPoint(icon.rectTransform.TransformPoint(icon.rectTransform.rect.center));
+            hoverLabel.rectTransform.anchoredPosition = new Vector2(center.x, center.y);
             hoverLabel.text = text;
             hoverLabel.gameObject.SetActive(!string.IsNullOrEmpty(text));
+            hoverLabel.transform.SetAsLastSibling();
+        }
+
+        private void HideHoverLabel(ClickableImage icon)
+        {
+            if (hoveredIcon != icon) return;
+            hoveredIcon = null;
+            hoverLabel.gameObject.SetActive(false);
         }
 
         private void ReloadCells()
@@ -159,8 +175,9 @@ namespace CountersPlus.UI.ViewControllers
                     flyoutGrid.gameObject, cell);
                 cell.Apply((CountersPlusListTableCell)items[i]);
                 string name = items[i].Text;
-                cell.Icon.PointerEnterEvent += _ => ShowHoverLabel(name);
-                cell.Icon.PointerExitEvent += _ => ShowHoverLabel(null);
+                ClickableImage icon = cell.Icon;
+                icon.PointerEnterEvent += _ => ShowHoverLabel(icon, name);
+                icon.PointerExitEvent += _ => HideHoverLabel(icon);
                 flyoutCells.Add(cell);
             }
             RefreshFlyoutSelection();
@@ -209,7 +226,6 @@ namespace CountersPlus.UI.ViewControllers
             openTop = rowTop + anchorRow * RowPitch;
             openBottom = rowBottom - (rows - 1 - anchorRow) * RowPitch;
             flyoutRect.anchoredPosition = new Vector2(stripCenter.x, rowTop);
-            hoverLabel.rectTransform.anchoredPosition = new Vector2(stripCenter.x, openTop + 3f);
             hoverLabel.gameObject.SetActive(false);
             lastHoveredTime = Time.unscaledTime;
 
@@ -223,6 +239,7 @@ namespace CountersPlus.UI.ViewControllers
         {
             expanded = false;
             if (flyoutRect == null) return;
+            hoveredIcon = null;
             hoverLabel.gameObject.SetActive(false);
             if (animated && isActiveAndEnabled && flyout.activeSelf)
             {
