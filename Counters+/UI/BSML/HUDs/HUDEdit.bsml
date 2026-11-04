@@ -40,6 +40,6 @@
   </bg>
 
   <horizontal anchor-max-y='0.15'>
-    <action-button text='Apply' on-click='fire-apply' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'/>
+    <action-button text='Done' on-click='fire-apply' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'/>
   </horizontal>
 </bg>

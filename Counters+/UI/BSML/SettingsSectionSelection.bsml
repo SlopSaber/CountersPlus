@@ -1,18 +1,8 @@
-﻿<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-
-  <!--Tab selection-->
-  <vertical ignore-layout='true' anchor-pos-y='-10' anchor-min-y='0.7'>
-    <tab-selector tab-tag='new-tab' select-cell='select-section'></tab-selector>
-    <tab tags='new-tab' tab-name='Main'></tab>
-    <tab tags='new-tab' tab-name='Counters'></tab>
-    <tab tags='new-tab' tab-name='HUDs'></tab>
-  </vertical>
-
-  <!--Settings selection-->  
-  <horizontal child-align="MiddleCenter" spacing="4">
+﻿<bg anchor-pos-y="-20" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
+  <horizontal child-align="MiddleCenter" spacing="3">
     <page-button id="left-button" click-event="list#PageUp" direction="Left"/>
     <custom-list size-delta-y="25" id="list" list-direction="Horizontal" visible-cells="5" select-cell="option-selected" cell-size="20">
-      
+
       <!--Cell Template-->
       <bg tags="hovered">
         <image tags='coverImage' size-delta-x='17.5' size-delta-y='17.5' img-color='#808080' preserve-aspect='true'/>
@@ -26,9 +16,11 @@
       </bg>
       <bg tags="un-selected-un-hovered">
         <image tags='coverImage' size-delta-x='17.5' size-delta-y='17.5' preserve-aspect='true'/>
+        <text tags='accentText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' anchor-pos-y='-11' align='Center' font-size='3'/>
       </bg>
-    
+
     </custom-list>
     <page-button id="right-button" click-event="list#PageDown" direction="Right"/>
+    <page-button id="expand-button" direction="Down" on-click="toggle-grid" hover-hint="Show all counters"/>
   </horizontal>
 </bg>

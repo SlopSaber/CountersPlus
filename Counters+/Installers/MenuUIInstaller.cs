@@ -1,7 +1,6 @@
-﻿using CountersPlus.Custom;
+using CountersPlus.Custom;
 using CountersPlus.UI;
 using CountersPlus.UI.FlowCoordinators;
-using CountersPlus.UI.SettingGroups;
 using CountersPlus.UI.ViewControllers;
 using CountersPlus.UI.ViewControllers.Editing;
 using CountersPlus.Utils;
@@ -21,9 +20,7 @@ namespace CountersPlus.Installers
             Container.Bind<CanvasUtility>().AsSingle();
             Container.Bind<MockCounter>().AsSingle();
 
-            BindSettingsGroup<MainSettingsGroup>();
-            BindSettingsGroup<CountersSettingsGroup>();
-            BindSettingsGroup<HUDsSettingsGroup>();
+            Container.Bind<CounterCatalog>().AsSingle();
 
             foreach (CustomCounter customCounter in Plugin.LoadedCustomCounters)
             {
@@ -46,7 +43,7 @@ namespace CountersPlus.Installers
             BindViewController<CountersPlusBlankViewController>();
             BindViewController<CountersPlusSettingSectionSelectionViewController>();
             BindViewController<CountersPlusCounterEditViewController>();
-            BindViewController<CountersPlusMainSettingsEditViewController>();
+            BindViewController<CountersPlusCounterGridViewController>();
             BindViewController<CountersPlusHUDListViewController>();
             BindViewController<CountersPlusHUDEditViewController>();
 
@@ -57,11 +54,6 @@ namespace CountersPlus.Installers
         private void BindViewController<T>() where T : ViewController
         {
             Container.Bind<T>().FromNewComponentAsViewController().AsSingle();
-        }
-
-        private void BindSettingsGroup<T>() where T : SettingsGroup
-        {
-            Container.Bind<SettingsGroup>().To<T>().AsCached().NonLazy();
         }
     }
 }

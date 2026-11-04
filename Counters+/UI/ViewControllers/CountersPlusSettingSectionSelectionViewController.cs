@@ -1,9 +1,8 @@
 ﻿using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
-using CountersPlus.UI.SettingGroups;
+using CountersPlus.UI.FlowCoordinators;
 using HMUI;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using Zenject;
@@ -12,15 +11,17 @@ namespace CountersPlus.UI.ViewControllers
 {
     public class CountersPlusSettingSectionSelectionViewController : BSMLResourceViewController
     {
-        [Inject] private List<SettingsGroup> loadedSettingsGroups = new List<SettingsGroup>();
+        [Inject] private CounterCatalog catalog { get; set; }
+        [Inject] private LazyInject<CountersPlusSettingsFlowCoordinator> flowCoordinator { get; set; }
+        [Inject] private LazyInject<CountersPlusCounterGridViewController> grid { get; set; }
 
         [UIComponent("list")] private CustomCellListTableData tableList { get; set; }
         [UIComponent("left-button")] private Button leftButton { get; set; }
         [UIComponent("right-button")] private Button rightButton { get; set; }
+        [UIComponent("expand-button")] private Button expandButton { get; set; }
 
         private ScrollView scrollView;
-
-        private SettingsGroup selectedGroup;
+        private bool expanded;
 
         public override string ResourceName => "CountersPlus.UI.BSML.SettingsSectionSelection.bsml";
 
@@ -31,7 +32,19 @@ namespace CountersPlus.UI.ViewControllers
             scrollView = tableList.TableView.scrollView;
             scrollView.scrollPositionChangedEvent += ScrollView_scrollPositionChangedEvent;
 
-            HandleCellSelectedEvent(null, (selectedGroup != null) ? loadedSettingsGroups.IndexOf(selectedGroup) : 0);
+            if (addedToHierarchy)
+            {
+                catalog.ClearSelection();
+                SetExpanded(false);
+            }
+            ReloadCells();
+        }
+
+        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
+        {
+            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
+            scrollView.scrollPositionChangedEvent -= ScrollView_scrollPositionChangedEvent;
+            if (removedFromHierarchy) expanded = false;
         }
 
         [UIAction("#post-parse")]
@@ -43,50 +56,59 @@ namespace CountersPlus.UI.ViewControllers
             leftButton.colors = colors;
         }
 
-        private void ScrollView_scrollPositionChangedEvent(float obj)
+        private void ReloadCells()
+        {
+            tableList.Data.Clear();
+            for (int i = 0; i < catalog.Count; i++)
+                tableList.Data.Add(catalog.CellInfo(i));
+            tableList.TableView.ReloadData();
+
+            if (catalog.SelectedIndex >= 0)
+            {
+                tableList.TableView.SelectCellWithIdx(catalog.SelectedIndex, false);
+                tableList.TableView.ScrollToCellWithIdx(catalog.SelectedIndex, TableView.ScrollPositionType.Center, false);
+            }
+            else
+            {
+                tableList.TableView.ClearSelection();
+                tableList.TableView.ScrollToCellWithIdx(0, TableView.ScrollPositionType.Beginning, false);
+            }
+            ScrollView_scrollPositionChangedEvent(0f);
+        }
+
+        private void ScrollView_scrollPositionChangedEvent(float _)
         {
             leftButton.interactable = scrollView._destinationPos > 0.001f;
             rightButton.interactable = scrollView._destinationPos < scrollView.contentSize - scrollView.scrollPageSize - 0.001f;
         }
 
-        protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemDisabling)
-        {
-            base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
-            scrollView.scrollPositionChangedEvent -= ScrollView_scrollPositionChangedEvent;
-        }
-
         [UIAction("option-selected")]
-        private void OptionSelected(TableView view, CountersPlusListTableCell cell)
+        private void OptionSelected(TableView view, CountersPlusListTableCell cell) => catalog.Select(cell.CellIdx);
+
+        [UIAction("toggle-grid")]
+        private void ToggleGrid() => SetExpanded(!expanded);
+
+        internal void SelectFromGrid(int idx)
         {
-            selectedGroup.OnCellSelect(view, cell.CellIdx);
+            SetExpanded(false);
+            tableList.TableView.SelectCellWithIdx(idx, false);
+            tableList.TableView.ScrollToCellWithIdx(idx, TableView.ScrollPositionType.Center, true);
+            catalog.Select(idx);
         }
 
-        [UIAction("select-section")]
-        private void HandleCellSelectedEvent(SegmentedControl _, int cellIdx)
+        private void SetExpanded(bool value)
         {
-            selectedGroup?.OnDisable();
-
-            selectedGroup = loadedSettingsGroups[cellIdx];
-
-            selectedGroup.OnEnable();
-
-            tableList.Data.Clear();
-
-            tableList.CellSizeValue = selectedGroup.GetSize();
-
-            CustomListTableData.CustomCellInfo[] items = new CustomListTableData.CustomCellInfo[selectedGroup.NumberOfCells()];
-            for (var i = 0; i < selectedGroup.NumberOfCells(); i++)
+            expanded = value;
+            expandButton.transform.localEulerAngles = new Vector3(0, 0, value ? 180 : 0);
+            if (value)
             {
-                items[i] = selectedGroup.CellInfoForIdx(i);
+                grid.Value.SelectionHandler = SelectFromGrid;
+                flowCoordinator.Value.PushToMainScreen(grid.Value);
             }
-            tableList.Data = items;
-
-            tableList.TableView.ReloadData();
-
-            tableList.TableView.ScrollToCellWithIdx(0, TableView.ScrollPositionType.Beginning, false);
-            tableList.TableView.SelectCellWithIdx(selectedGroup.CellToSelect(), false);
-
-            ScrollView_scrollPositionChangedEvent(0f);
+            else
+            {
+                flowCoordinator.Value.PopFromMainScreen();
+            }
         }
     }
 }

@@ -21,6 +21,13 @@ namespace CountersPlus.Utils
 
         private float hudDepth = 7f;
 
+        // Settings previews have no gameplay HUD. They are pushed away from the viewer, keeping their
+        // apparent size, so the menu screens stay in front of them.
+        private static readonly Vector3 PreviewViewpoint = new Vector3(0, 1.5f, 0);
+        private readonly bool isPreview;
+
+        internal float PreviewDepthScale => isPreview ? 1.6f : 1f;
+
         // Using the magical power of Zenject™, we magically find ourselves with an instance of
         // our HUDConfigModel and the CoreGameHUDController.
         internal CanvasUtility(HUDConfigModel hudConfig,
@@ -32,6 +39,7 @@ namespace CountersPlus.Utils
         {
             this.mainConfig = mainConfig;
             this.gamePause = gamePause;
+            isPreview = coreGameHUD == null && data == null;
             if (coreGameHUD != null)
             {
                 hudDepth = coreGameHUD.GetComponentInChildren<ComboUIController>().transform.position.z;
@@ -111,7 +119,10 @@ namespace CountersPlus.Utils
             Canvas canvas = canvasGameObject.AddComponent<Canvas>();
             canvas.renderMode = RenderMode.WorldSpace;
 
-            canvasGameObject.transform.localScale = Vector3.one / canvasSize;
+            if (isPreview)
+                canvasPos = PreviewViewpoint + (canvasPos - PreviewViewpoint) * PreviewDepthScale;
+
+            canvasGameObject.transform.localScale = Vector3.one * PreviewDepthScale / canvasSize;
             canvasGameObject.transform.position = canvasPos;
             canvasGameObject.transform.rotation = Quaternion.Euler(canvasRot);
 
@@ -130,7 +141,7 @@ namespace CountersPlus.Utils
                 canvas.gameObject.layer = energyCanvas.gameObject.layer;
             }
 
-            if (LayerMask.NameToLayer("ScreenDisplacement") == 17)
+            if (!isPreview && LayerMask.NameToLayer("ScreenDisplacement") == 17)
                 canvasGameObject.AddComponent<CounterForegroundCanvas>().Initialize(gamePause);
 
             return canvas;

@@ -44,6 +44,7 @@ namespace CountersPlus.UI.FlowCoordinators
             {
                 showBackButton = true;
                 SetTitle("Counters+");
+                mainScreenNavigation.AssignViewController(blank);
             }
 
             ProvideInitialViewControllers(mainScreenNavigation, credits, null, settingsSelection);

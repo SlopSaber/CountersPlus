@@ -8,9 +8,9 @@ using CountersPlus.UI.FlowCoordinators;
 using CountersPlus.UI.ViewControllers.Editing;
 using CountersPlus.Utils;
 using HMUI;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 using Zenject;
 
 namespace CountersPlus.UI.ViewControllers
@@ -19,14 +19,15 @@ namespace CountersPlus.UI.ViewControllers
     {
         public override string ResourceName => "CountersPlus.UI.BSML.HUDs.HUDList.bsml";
 
-        public bool IsDeleting = false;
-        public int SelectedCanvas { get; private set; } = -1;
+        public int? SelectedCanvas { get; private set; }
         private Sprite blankSprite;
 
         [UIComponent("list")] private CustomListTableData data { get; set; }
         [UIComponent("new-canvas-name")] private ModalKeyboard newCanvasKeyboard { get; set; }
         [UIComponent("delete-canvas")] private ModalView deleteCanvas { get; set; }
         [UIComponent("canvas-error")] private ModalView canvasError { get; set; }
+        [UIComponent("edit-button")] private Button editButton { get; set; }
+        [UIComponent("delete-button")] private Button deleteButton { get; set; }
         [UIParams] private BSMLParserParams parserParams = null;
 
         [Inject] private HUDConfigModel hudConfig { get; set; }
@@ -40,7 +41,6 @@ namespace CountersPlus.UI.ViewControllers
             base.DidActivate(firstActivation, addedToHierarchy, screenSystemEnabling);
             RefreshData();
             ClearSelection();
-            IsDeleting = false;
         }
 
         protected override void DidDeactivate(bool removedFromHierarchy, bool screenSystemEnabling)
@@ -62,6 +62,11 @@ namespace CountersPlus.UI.ViewControllers
                 data.Data.Add(info);
             }
             data.TableView.ReloadData();
+            if (SelectedCanvas.HasValue && SelectedCanvas.Value + 1 < data.Data.Count)
+                data.TableView.SelectCellWithIdx(SelectedCanvas.Value + 1, false);
+            else
+                SelectedCanvas = null;
+            RefreshButtons();
         }
 
         protected override void OnDestroy()
@@ -70,50 +75,64 @@ namespace CountersPlus.UI.ViewControllers
             base.OnDestroy();
         }
 
-        public void CreateNewCanvasDialog()
+        public void DeactivateModals() => parserParams.EmitEvent("on-deactivate");
+
+        public void ClearSelection()
         {
-            flowCoordinator.Value.SetRightViewController(null);
+            SelectedCanvas = null;
+            data.TableView.ClearSelection();
+            RefreshButtons();
+        }
+
+        private void RefreshButtons()
+        {
+            editButton.interactable = SelectedCanvas.HasValue;
+            deleteButton.interactable = SelectedCanvas.HasValue;
+        }
+
+        [UIAction("cell-selected")]
+        private void CellSelected(TableView view, int idx)
+        {
+            SelectedCanvas = idx - 1;
+            RefreshButtons();
+        }
+
+        [UIAction("new-canvas")]
+        private void NewCanvas()
+        {
             DeactivateModals();
             newCanvasKeyboard.ModalView.Show(true);
         }
 
-        public void DeactivateModals() => parserParams.EmitEvent("on-deactivate");
-
-        public void ClearSelection() => data.TableView.ClearSelection();
-
-        [UIAction("cell-selected")]
-        private void CellSelected (TableView view, int idx)
+        [UIAction("edit-canvas")]
+        private void EditCanvas()
         {
-            SelectedCanvas = idx - 1;
-            if (IsDeleting)
-            {
-                flowCoordinator.Value.SetRightViewController(null);
-                DeactivateModals();
-                if (idx == 0)
-                {
-                    canvasError.Show(true);
-                }
-                else
-                {
-                    deleteCanvas.Show(true);
-                }
-            }
-            else
-            {
-                flowCoordinator.Value.SetRightViewController(hudEdit.Value);
-                hudEdit.Value.ApplyCanvasForEditing(SelectedCanvas);
-            }
+            if (!SelectedCanvas.HasValue) return;
+            DeactivateModals();
+            int canvas = SelectedCanvas.Value;
+            flowCoordinator.Value.SetRightViewController(hudEdit.Value);
+            hudEdit.Value.ApplyCanvasForEditing(canvas);
+        }
+
+        [UIAction("delete-canvas-prompt")]
+        private void DeleteCanvasPrompt()
+        {
+            if (!SelectedCanvas.HasValue) return;
+            DeactivateModals();
+            if (SelectedCanvas.Value == -1) canvasError.Show(true);
+            else deleteCanvas.Show(true);
         }
 
         [UIAction("create-new-canvas")]
         private void CreateNewCanvas(string name)
         {
             HUDCanvas settings = new HUDCanvas();
-            if (string.IsNullOrEmpty(name) || string.IsNullOrWhiteSpace(name)) name = "New Canvas";
+            if (string.IsNullOrWhiteSpace(name)) name = "New Canvas";
             settings.Name = name;
             canvasUtility.RegisterNewCanvas(settings, hudConfig.OtherCanvasSettings.Count);
             hudConfig.OtherCanvasSettings.Add(settings);
             mainConfig.HUDConfig = hudConfig;
+            SelectedCanvas = hudConfig.OtherCanvasSettings.Count - 1;
             RefreshData();
         }
 
@@ -121,24 +140,19 @@ namespace CountersPlus.UI.ViewControllers
         private void DeleteSelectedCanvas()
         {
             DeactivateModals();
-            if (SelectedCanvas == -1) return;
-            IEnumerable<ConfigModel> needToUpdate = flowCoordinator.Value.AllConfigModels.Where(x => x.CanvasID == SelectedCanvas);
-            for (int i = 0; i < needToUpdate.Count(); i++)
-            {
-                needToUpdate.ElementAt(i).CanvasID = -1;
-            }
-            canvasUtility.UnregisterCanvas(SelectedCanvas);
-            hudConfig.OtherCanvasSettings.RemoveAt(SelectedCanvas);
+            if (!SelectedCanvas.HasValue || SelectedCanvas.Value == -1) return;
+            int canvas = SelectedCanvas.Value;
+            foreach (ConfigModel model in flowCoordinator.Value.AllConfigModels.Where(x => x.CanvasID == canvas).ToList())
+                model.CanvasID = -1;
+            canvasUtility.UnregisterCanvas(canvas);
+            hudConfig.OtherCanvasSettings.RemoveAt(canvas);
             mainConfig.HUDConfig = hudConfig;
-            SelectedCanvas--;
+            SelectedCanvas = null;
             RefreshData();
             flowCoordinator.Value.RefreshAllMockCounters();
         }
 
         [UIAction("cancel-deletion")]
-        private void CancelCanvasDeletion()
-        {
-            DeactivateModals();
-        }
+        private void CancelCanvasDeletion() => DeactivateModals();
     }
 }

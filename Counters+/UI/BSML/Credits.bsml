@@ -1,19 +1,27 @@
 ﻿<bg xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  
-  <vertical child-control-height='false'>
-    <vertical bg='round-rect-panel' size-delta-y='25' pad='5'>
-      <text id='aprilFoolsText' align ='Center' font-size='6' text='April fools!'/>
-      <text id='versionText' align ='Center' font-size='3' text='Version 0.0.0'/>
-      <text id='updateText' align ='Center' font-size='3' text='Version 0.0.0 available for download!'/>
-      <text id='creatorText' align ='Center' font-size='5' text='Developed by Caeden117'/>
+  <vertical spacing='1' pad-top='1' pad-bottom='1' child-control-height='true' child-expand-height='false' vertical-fit='Unconstrained'>
+
+    <!--Compact credits-->
+    <horizontal bg='round-rect-panel' pad='2' spacing='2' pref-width='100' pref-height='17' child-expand-width='false'>
+      <vertical spacing='0' pref-width='58' child-expand-height='false' child-align='MiddleLeft'>
+        <text id='aprilFoolsText' align='Left' font-size='3.5' text='April fools!'/>
+        <text id='creatorText' align='Left' font-size='4' text='Developed by Caeden117'/>
+        <text id='versionText' align='Left' font-size='3' text='Version 0.0.0'/>
+        <text id='updateText' align='Left' font-size='2.5' text='Version 0.0.0 available for download!'/>
+        <text id='linkOpenedText' align='Left' font-size='2.5' text='Link opened in your browser!'/>
+      </vertical>
+      <vertical spacing='0.5' pref-width='34' child-expand-height='false'>
+        <button id='github' text='GitHub' pref-width='34' pref-height='5'/>
+        <button id='donate' text='Donate' pref-width='34' pref-height='5'/>
+        <button id='issues' text='Report an Issue' pref-width='34' pref-height='5'/>
+      </vertical>
+    </horizontal>
+
+    <!--Main settings-->
+    <vertical bg='round-rect-panel' pref-width='100' pref-height='58' child-control-height='true' child-expand-height='true'>
+      <scroll-view>
+        <vertical id='main-settings' pad-left='3' pad-right='3' pad-top='1' spacing='0' vertical-fit='PreferredSize'/>
+      </scroll-view>
     </vertical>
   </vertical>
-  
-  <text id='linkOpenedText' align ='Center' font-size='4' text='Link opened in your browser!'/>
-  
-  <horizontal anchor-max-y='0.5'>
-    <button id='github' text='GitHub' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'/>
-    <button id='donate' text='Donate' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'/>
-    <button id='issues' text='Report an Issue' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'/>
-  </horizontal>
 </bg>

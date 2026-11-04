@@ -49,9 +49,7 @@ namespace CountersPlus.UI.ViewControllers.Editing
 
         private void CurrentlyEditing_OnCanvasSettingsApply()
         {
-            flowCoordinator.Value.SetRightViewController(null);
-            hudList.Value.ClearSelection();
-            hudList.Value.RefreshData();
+            flowCoordinator.Value.SetRightViewController(hudList.Value);
         }
 
         private void CurrentlyEditing_OnCanvasSettingsChanged()
