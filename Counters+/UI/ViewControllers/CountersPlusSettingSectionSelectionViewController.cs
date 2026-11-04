@@ -93,6 +93,16 @@ namespace CountersPlus.UI.ViewControllers
             flyoutGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             flyoutGrid.constraintCount = Columns;
 
+            // The collapsed strip shows exactly one flyout row so opening and closing line up.
+            float stripWidth = Columns * RowPitch;
+            if (!tableList.TryGetComponent(out LayoutElement stripLayout))
+                stripLayout = tableList.gameObject.AddComponent<LayoutElement>();
+            stripLayout.preferredWidth = stripWidth;
+            stripLayout.minWidth = stripWidth;
+            stripLayout.flexibleWidth = 0;
+            var stripRect = (RectTransform)tableList.transform;
+            stripRect.sizeDelta = new Vector2(stripWidth, stripRect.sizeDelta.y);
+
             stripGroup = tableList.gameObject.AddComponent<CanvasGroup>();
             tableList.gameObject.AddComponent<HoverRelay>().Entered = data =>
             {

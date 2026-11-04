@@ -1,6 +1,6 @@
 <bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
-  <horizontal child-align="MiddleCenter">
-    <custom-list size-delta-y="16.5" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="13.5">
+  <horizontal child-align="MiddleCenter" child-expand-width='false' horizontal-fit='PreferredSize'>
+    <custom-list size-delta-y="16.5" pref-width="94.5" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="13.5">
 
       <!--Cell Template-->
       <bg tags="hovered">
