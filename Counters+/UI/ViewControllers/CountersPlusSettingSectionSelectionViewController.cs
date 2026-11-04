@@ -20,7 +20,7 @@ namespace CountersPlus.UI.ViewControllers
         private const float IconSize = 12f;
         private const float IconSpacing = 1.5f;
         private const float RowPitch = IconSize + IconSpacing;
-        private const float Padding = 2f;
+        private const float Padding = 4f;
         private const float AnimationSeconds = 0.15f;
         private const float CloseDelaySeconds = 0.12f;
         private static readonly Color SelectedColor = new Color(0f, 0.75f, 1f);
@@ -165,19 +165,26 @@ namespace CountersPlus.UI.ViewControllers
         private void RebuildFlyout(List<CustomListTableData.CustomCellInfo> items)
         {
             foreach (FlyoutCell cell in flyoutCells)
-                if (cell.Icon != null) Destroy(cell.Icon.gameObject);
+                if (cell.Root != null) Destroy(cell.Root);
             flyoutCells.Clear();
 
             for (int i = 0; i < items.Count; i++)
             {
                 var cell = new FlyoutCell(i, this);
-                BSMLParser.Instance.Parse("<clickable-image id='icon' preserve-aspect='true' on-click='clicked'/>",
-                    flyoutGrid.gameObject, cell);
+                BSMLParser.Instance.Parse(FlyoutCellLayout, flyoutGrid.gameObject, cell);
                 cell.Apply((CountersPlusListTableCell)items[i]);
                 string name = items[i].Text;
                 ClickableImage icon = cell.Icon;
-                icon.PointerEnterEvent += _ => ShowHoverLabel(icon, name);
-                icon.PointerExitEvent += _ => HideHoverLabel(icon);
+                icon.PointerEnterEvent += _ =>
+                {
+                    cell.SetHovered(true);
+                    ShowHoverLabel(icon, name);
+                };
+                icon.PointerExitEvent += _ =>
+                {
+                    cell.SetHovered(false);
+                    HideHoverLabel(icon);
+                };
                 flyoutCells.Add(cell);
             }
             RefreshFlyoutSelection();
@@ -307,11 +314,25 @@ namespace CountersPlus.UI.ViewControllers
             public void OnPointerEnter(PointerEventData eventData) => Entered?.Invoke(eventData);
         }
 
+        // Mirrors the strip's cell states: a cyan glow frame marks the selection and a white one the hovered entry.
+        private const string FlyoutCellLayout =
+            "<bg id='root'>" +
+            "<image id='glow' source='#ArtworkSmallGlow' size-delta-x='18.5' size-delta-y='18.5' preserve-aspect='true'/>" +
+            "<clickable-image id='icon' size-delta-x='12' size-delta-y='12' preserve-aspect='true' on-click='clicked'/>" +
+            "</bg>";
+
+        private static readonly Color HoverGlowColor = new Color(1f, 1f, 1f, 0.85f);
+        private const float HoverScale = 1.12f;
+
         private class FlyoutCell
         {
             private readonly CountersPlusSettingSectionSelectionViewController owner;
             private Color baseColor = Color.white;
+            private bool selected;
+            private bool hovered;
 
+            [UIObject("root")] public GameObject Root = null;
+            [UIComponent("glow")] private ImageView glow = null;
             [UIComponent("icon")] public ClickableImage Icon = null;
 
             public int Index { get; }
@@ -325,14 +346,30 @@ namespace CountersPlus.UI.ViewControllers
             public void Apply(CountersPlusListTableCell info)
             {
                 Icon.sprite = info.Icon;
+                glow.raycastTarget = false;
                 baseColor = info.IsAccent ? CountersPlusListTableCell.AccentColor : Color.white;
+                Icon.DefaultColor = baseColor;
+                Icon.HighlightColor = Color.Lerp(baseColor, Color.white, 0.5f);
+                Refresh();
             }
 
-            public void SetSelected(bool selected)
+            public void SetSelected(bool value)
             {
-                Color color = selected ? SelectedColor : baseColor;
-                Icon.DefaultColor = color;
-                Icon.HighlightColor = Color.Lerp(color, Color.white, 0.5f);
+                selected = value;
+                Refresh();
+            }
+
+            public void SetHovered(bool value)
+            {
+                hovered = value;
+                Refresh();
+            }
+
+            private void Refresh()
+            {
+                glow.gameObject.SetActive(selected || hovered);
+                glow.color = selected ? SelectedColor : HoverGlowColor;
+                Icon.transform.localScale = Vector3.one * (hovered ? HoverScale : 1f);
             }
 
             [UIAction("clicked")]
