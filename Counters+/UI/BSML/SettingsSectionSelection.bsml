@@ -1,39 +1,30 @@
 ﻿<bg anchor-pos-y="-25" xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='https://monkeymanboy.github.io/BSML-Docs/ https://raw.githubusercontent.com/monkeymanboy/BSML-Docs/gh-pages/BSMLSchema.xsd'>
   <horizontal child-align="MiddleCenter" spacing="3">
     <page-button id="left-button" click-event="list#PageUp" direction="Left"/>
-    <custom-list size-delta-y="25" id="list" list-direction="Horizontal" visible-cells="5" select-cell="option-selected" cell-size="20">
+    <custom-list size-delta-y="22" id="list" list-direction="Horizontal" visible-cells="7" select-cell="option-selected" cell-size="18">
 
       <!--Cell Template-->
       <bg tags="hovered">
-        <image tags='coverImage' size-delta-x='17.5' size-delta-y='17.5' img-color='#808080' preserve-aspect='true'/>
-        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='27.5' size-delta-y='27.5' preserve-aspect='true'/>
+        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' img-color='#808080' preserve-aspect='true'/>
+        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='24.5' size-delta-y='24.5' preserve-aspect='true'/>
         <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center'/>
       </bg>
       <bg tags="selected">
-        <image tags='coverImage' size-delta-x='17.5' size-delta-y='17.5' img-color='#808000' preserve-aspect='true'/>
-        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='27.5' size-delta-y='27.5' img-color='#00C0FF' preserve-aspect='true'/>
+        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' img-color='#808000' preserve-aspect='true'/>
+        <image tags='selectedImage' source='#ArtworkSmallGlow' size-delta-x='24.5' size-delta-y='24.5' img-color='#00C0FF' preserve-aspect='true'/>
         <text tags='infoText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' align='Center'/>
       </bg>
       <bg tags="un-selected-un-hovered">
-        <image tags='coverImage' size-delta-x='17.5' size-delta-y='17.5' preserve-aspect='true'/>
-        <text tags='accentText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' anchor-pos-y='-11' align='Center' font-size='3'/>
+        <image tags='coverImage' size-delta-x='15.5' size-delta-y='15.5' preserve-aspect='true'/>
+        <text tags='accentText' size-delta-x='0' size-delta-y='0' anchor-min-x='0' anchor-max-x='1' anchor-pos-y='-10' align='Center' font-size='3'/>
       </bg>
 
     </custom-list>
     <page-button id="right-button" click-event="list#PageDown" direction="Right"/>
   </horizontal>
 
-  <!--Playlist-style flyout with every entry-->
-  <vertical id='flyout' bg='round-rect-panel' ignore-layout='true' active='false'
-            anchor-min-x='0.5' anchor-max-x='0.5' anchor-min-y='0.5' anchor-max-y='0.5' pivot-x='0.5' pivot-y='0' anchor-pos-y='-12.5'
-            size-delta-x='122' size-delta-y='26' pad='2' vertical-fit='Unconstrained' horizontal-fit='Unconstrained'
-            child-control-height='false' child-control-width='false' child-align='LowerCenter'>
-    <grid id='flyout-grid' cell-size-x='20' cell-size-y='20' spacing-x='2' spacing-y='2' child-align='LowerCenter'/>
-  </vertical>
-
-  <!--Flyout toggle beneath the strip, like the base game's playlist expander-->
-  <horizontal ignore-layout='true' anchor-min-x='0.5' anchor-max-x='0.5' anchor-min-y='0.5' anchor-max-y='0.5'
-              anchor-pos-y='-15' size-delta-x='20' size-delta-y='6'>
-    <page-button id='expand-button' direction='Down' pref-width='14' pref-height='5' on-click='toggle-flyout' hover-hint='Show all counters'/>
-  </horizontal>
+  <!--Playlist-style flyout with every entry, positioned and animated from code-->
+  <bg id='flyout' bg='round-rect-panel' active='false'>
+    <grid id='flyout-grid' cell-size-x='18' cell-size-y='18' spacing-x='0' spacing-y='0' child-align='UpperCenter'/>
+  </bg>
 </bg>

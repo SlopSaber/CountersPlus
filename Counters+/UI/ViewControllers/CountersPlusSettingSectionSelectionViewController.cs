@@ -3,9 +3,11 @@ using BeatSaberMarkupLanguage.Attributes;
 using BeatSaberMarkupLanguage.Components;
 using BeatSaberMarkupLanguage.ViewControllers;
 using HMUI;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using Zenject;
 
@@ -13,11 +15,10 @@ namespace CountersPlus.UI.ViewControllers
 {
     public class CountersPlusSettingSectionSelectionViewController : BSMLResourceViewController
     {
-        private const int FlyoutColumns = 5;
-        private const float FlyoutCellSize = 20f;
-        private const float FlyoutSpacing = 2f;
-        private const float FlyoutPadding = 2f;
-        private const float FlyoutAnimationSeconds = 0.15f;
+        private const int Columns = 7;
+        private const float CellSize = 18f;
+        private const float Padding = 2f;
+        private const float AnimationSeconds = 0.15f;
         private static readonly Color SelectedColor = new Color(0f, 0.75f, 1f);
 
         [Inject] private CounterCatalog catalog { get; set; }
@@ -25,14 +26,17 @@ namespace CountersPlus.UI.ViewControllers
         [UIComponent("list")] private CustomCellListTableData tableList { get; set; }
         [UIComponent("left-button")] private Button leftButton { get; set; }
         [UIComponent("right-button")] private Button rightButton { get; set; }
-        [UIComponent("expand-button")] private Button expandButton { get; set; }
         [UIObject("flyout")] private GameObject flyout { get; set; }
         [UIComponent("flyout-grid")] private GridLayoutGroup flyoutGrid { get; set; }
 
         private readonly List<FlyoutCell> flyoutCells = new List<FlyoutCell>();
         private ScrollView scrollView;
+        private RectTransform flyoutRect;
+        private RectTransform gridRect;
         private bool expanded;
+        private bool suppressHoverUntilExit;
         private Coroutine animation;
+        private float openTop, openBottom, rowTop, rowBottom;
 
         public override string ResourceName => "CountersPlus.UI.BSML.SettingsSectionSelection.bsml";
 
@@ -43,15 +47,10 @@ namespace CountersPlus.UI.ViewControllers
             scrollView = tableList.TableView.scrollView;
             scrollView.scrollPositionChangedEvent += ScrollView_scrollPositionChangedEvent;
 
-            if (firstActivation)
-            {
-                flyoutGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
-                flyoutGrid.constraintCount = FlyoutColumns;
-                flyout.AddComponent<RectMask2D>();
-            }
+            if (firstActivation) SetupFlyout();
             if (addedToHierarchy) catalog.ClearSelection();
 
-            SetExpanded(false, false);
+            Collapse(false);
             ReloadCells();
         }
 
@@ -59,7 +58,7 @@ namespace CountersPlus.UI.ViewControllers
         {
             base.DidDeactivate(removedFromHierarchy, screenSystemDisabling);
             scrollView.scrollPositionChangedEvent -= ScrollView_scrollPositionChangedEvent;
-            SetExpanded(false, false);
+            Collapse(false);
         }
 
         [UIAction("#post-parse")]
@@ -69,6 +68,32 @@ namespace CountersPlus.UI.ViewControllers
             colors.disabledColor = Color.black;
             rightButton.colors = colors;
             leftButton.colors = colors;
+        }
+
+        private void SetupFlyout()
+        {
+            flyoutRect = (RectTransform)flyout.transform;
+            flyoutRect.anchorMin = flyoutRect.anchorMax = new Vector2(0.5f, 0.5f);
+            flyoutRect.pivot = new Vector2(0.5f, 1f);
+            flyoutRect.sizeDelta = new Vector2(Columns * CellSize + Padding * 2, CellSize + Padding * 2);
+            flyout.AddComponent<RectMask2D>();
+            flyout.AddComponent<HoverRelay>().Exited = () =>
+            {
+                if (expanded) Collapse(true);
+            };
+
+            gridRect = (RectTransform)flyoutGrid.transform;
+            gridRect.anchorMin = gridRect.anchorMax = new Vector2(0.5f, 1f);
+            gridRect.pivot = new Vector2(0.5f, 1f);
+            flyoutGrid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
+            flyoutGrid.constraintCount = Columns;
+
+            var strip = tableList.gameObject.AddComponent<HoverRelay>();
+            strip.Entered = () =>
+            {
+                if (!suppressHoverUntilExit && !expanded) Expand();
+            };
+            strip.Exited = () => suppressHoverUntilExit = false;
         }
 
         private void ReloadCells()
@@ -130,62 +155,113 @@ namespace CountersPlus.UI.ViewControllers
             RefreshFlyoutSelection();
         }
 
-        [UIAction("toggle-flyout")]
-        private void ToggleFlyout() => SetExpanded(!expanded, true);
-
         private void SelectFromFlyout(int idx)
         {
-            tableList.TableView.SelectCellWithIdx(idx, false);
-            tableList.TableView.ScrollToCellWithIdx(idx, TableView.ScrollPositionType.Center, false);
             catalog.Select(idx);
             RefreshFlyoutSelection();
-            SetExpanded(false, true);
+            suppressHoverUntilExit = true;
+            Collapse(true);
+            tableList.TableView.SelectCellWithIdx(idx, false);
+            tableList.TableView.ScrollToCellWithIdx(idx, TableView.ScrollPositionType.Center, false);
         }
 
-        private float ExpandedHeight()
+        // The row holding the current selection stays over the strip; earlier rows open upward and later rows downward.
+        private void Expand()
         {
-            int rows = Mathf.Max(1, Mathf.CeilToInt(flyoutCells.Count / (float)FlyoutColumns));
-            return rows * FlyoutCellSize + (rows - 1) * FlyoutSpacing + FlyoutPadding * 2;
-        }
+            if (flyoutRect == null || flyoutCells.Count == 0) return;
+            expanded = true;
 
-        private void SetExpanded(bool value, bool animated)
-        {
-            expanded = value;
-            if (expandButton != null)
-                expandButton.transform.localEulerAngles = new Vector3(0, 0, value ? 180 : 0);
-            if (flyout == null) return;
+            int rows = Mathf.CeilToInt(flyoutCells.Count / (float)Columns);
+            int anchorRow = catalog.SelectedIndex >= 0 ? catalog.SelectedIndex / Columns : 0;
 
-            if (animation != null)
-            {
-                StopCoroutine(animation);
-                animation = null;
-            }
+            tableList.TableView.ScrollToCellWithIdx(anchorRow * Columns, TableView.ScrollPositionType.Beginning, false);
 
-            var rect = (RectTransform)flyout.transform;
-            float collapsed = FlyoutCellSize + FlyoutPadding * 2;
-            float target = value ? ExpandedHeight() : collapsed;
-            if (!animated || !isActiveAndEnabled)
-            {
-                rect.sizeDelta = new Vector2(rect.sizeDelta.x, target);
-                flyout.SetActive(value);
-                return;
-            }
+            var listRect = (RectTransform)tableList.transform;
+            var parent = (RectTransform)flyoutRect.parent;
+            Vector3 stripCenter = parent.InverseTransformPoint(listRect.TransformPoint(listRect.rect.center));
+
+            rowTop = stripCenter.y + CellSize / 2 + Padding;
+            rowBottom = stripCenter.y - CellSize / 2 - Padding;
+            openTop = rowTop + anchorRow * CellSize;
+            openBottom = rowBottom - (rows - 1 - anchorRow) * CellSize;
+            flyoutRect.anchoredPosition = new Vector2(stripCenter.x, rowTop);
 
             flyout.SetActive(true);
-            animation = StartCoroutine(AnimateFlyout(rect, value ? collapsed : rect.sizeDelta.y, target, value));
+            flyout.transform.SetAsLastSibling();
+            Animate(1f);
         }
 
-        private IEnumerator AnimateFlyout(RectTransform rect, float from, float to, bool stayOpen)
+        private void Collapse(bool animated)
         {
-            for (float t = 0; t < FlyoutAnimationSeconds; t += Time.deltaTime)
+            expanded = false;
+            if (flyoutRect == null) return;
+            if (animated && isActiveAndEnabled && flyout.activeSelf)
             {
-                float eased = 1f - Mathf.Pow(1f - t / FlyoutAnimationSeconds, 3f);
-                rect.sizeDelta = new Vector2(rect.sizeDelta.x, Mathf.Lerp(from, to, eased));
+                Animate(0f);
+                return;
+            }
+            StopAnimation();
+            openAmount = 0f;
+            flyout.SetActive(false);
+        }
+
+        private void StopAnimation()
+        {
+            if (animation == null) return;
+            StopCoroutine(animation);
+            animation = null;
+        }
+
+        private float openAmount;
+
+        private void Animate(float target)
+        {
+            StopAnimation();
+            if (!isActiveAndEnabled)
+            {
+                ApplyOpenAmount(target);
+                flyout.SetActive(target > 0f);
+                return;
+            }
+            animation = StartCoroutine(AnimateTo(target));
+        }
+
+        private IEnumerator AnimateTo(float target)
+        {
+            float start = openAmount;
+            for (float t = 0; t < AnimationSeconds; t += Time.deltaTime)
+            {
+                float eased = 1f - Mathf.Pow(1f - t / AnimationSeconds, 3f);
+                ApplyOpenAmount(Mathf.Lerp(start, target, eased));
                 yield return null;
             }
-            rect.sizeDelta = new Vector2(rect.sizeDelta.x, to);
-            flyout.SetActive(stayOpen);
+            ApplyOpenAmount(target);
+            if (target <= 0f) flyout.SetActive(false);
             animation = null;
+        }
+
+        private void ApplyOpenAmount(float amount)
+        {
+            openAmount = amount;
+            float top = Mathf.Lerp(rowTop, openTop, amount);
+            float bottom = Mathf.Lerp(rowBottom, openBottom, amount);
+            flyoutRect.anchoredPosition = new Vector2(flyoutRect.anchoredPosition.x, top);
+            flyoutRect.sizeDelta = new Vector2(flyoutRect.sizeDelta.x, top - bottom);
+            // Keep the grid fixed in place while the mask grows around it.
+            gridRect.anchoredPosition = new Vector2(0, (openTop - Padding) - top);
+        }
+
+        private sealed class HoverRelay : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+        {
+            public Action Entered;
+            public Action Exited;
+
+            public void OnPointerEnter(PointerEventData eventData) => Entered?.Invoke();
+
+            public void OnPointerExit(PointerEventData eventData)
+            {
+                if (eventData.fullyExited) Exited?.Invoke();
+            }
         }
 
         private class FlyoutCell

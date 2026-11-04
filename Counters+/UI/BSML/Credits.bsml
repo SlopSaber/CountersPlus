@@ -2,7 +2,7 @@
   <vertical spacing='1' pad-top='1' child-control-height='true' child-expand-height='false' vertical-fit='Unconstrained'>
 
     <!--Compact credits-->
-    <vertical bg='round-rect-panel' pref-width='100' pad='1.5' spacing='0.5' child-expand-height='false'>
+    <vertical bg='round-rect-panel' pref-width='100' pad='2' spacing='0.5' child-expand-height='false'>
       <horizontal spacing='3' child-expand-width='false' child-align='MiddleCenter'>
         <text id='creatorText' align='Center' font-size='3.5' text='Developed by Caeden117'/>
         <text id='versionText' align='Center' font-size='3' text='Version 0.0.0'/>
