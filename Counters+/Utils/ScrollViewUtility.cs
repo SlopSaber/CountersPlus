@@ -1,4 +1,5 @@
 using BeatSaberMarkupLanguage.Components;
+using BeatSaberMarkupLanguage.Components.Settings;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -8,7 +9,8 @@ namespace CountersPlus.Utils
     {
         /// <summary>
         /// BSML scroll views size their content to its preferred width, so wide rows overflow and are clipped on
-        /// both sides. Settings panels instead lay their content out at the viewport's width.
+        /// both sides, while settings rows keep a fixed width that leaves a gap before the scrollbar. Settings
+        /// panels instead lay their content out at the viewport's width with rows stretched across it.
         /// </summary>
         internal static void FitContentToViewportWidth(BSMLScrollView scrollView)
         {
@@ -22,18 +24,18 @@ namespace CountersPlus.Utils
             content.anchorMax = new Vector2(1, content.anchorMax.y);
             content.sizeDelta = new Vector2(0, content.sizeDelta.y);
 
-            if (content.TryGetComponent(out VerticalLayoutGroup layout))
+            foreach (VerticalLayoutGroup layout in content.GetComponentsInChildren<VerticalLayoutGroup>(true))
             {
                 layout.childControlWidth = true;
                 layout.childForceExpandWidth = true;
+                if (layout.TryGetComponent(out ContentSizeFitter nestedFitter))
+                    nestedFitter.horizontalFit = ContentSizeFitter.FitMode.Unconstrained;
             }
-            foreach (Transform child in content)
+
+            foreach (GenericSetting setting in content.GetComponentsInChildren<GenericSetting>(true))
             {
-                if (child.TryGetComponent(out VerticalLayoutGroup childLayout))
-                {
-                    childLayout.childControlWidth = true;
-                    childLayout.childForceExpandWidth = true;
-                }
+                if (setting.TryGetComponent(out LayoutElement element))
+                    element.flexibleWidth = 1;
             }
         }
     }
