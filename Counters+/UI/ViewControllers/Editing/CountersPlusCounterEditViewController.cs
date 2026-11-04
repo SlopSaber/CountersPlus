@@ -27,7 +27,7 @@ namespace CountersPlus.UI.ViewControllers.Editing
         [Inject] private DiContainer diContainer { get; set; }
 
         [UIObject("body")] private GameObject settingsContainer { get; set; }
-        [UIComponent("ScrollContent")] private BSMLScrollableContainer scrollView { get; set; }
+        [UIComponent("ScrollContent")] private BSMLScrollView scrollView { get; set; }
         [UIComponent("name")] private TextMeshProUGUI settingsHeader { get; set; }
 
         private Dictionary<ConfigModel, HashSet<GameObject>> cachedSettings = new Dictionary<ConfigModel, HashSet<GameObject>>();
