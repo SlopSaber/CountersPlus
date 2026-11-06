@@ -44,7 +44,35 @@ namespace CountersPlus.UI
             TMP_Text multiplier = preview.CreateText();
             multiplier.text = "x4";
             multiplier.fontSize = 4;
-            multiplier.fontStyle = FontStyles.Italic;
+        }
+
+        private const float ScoreUnitScale = 0.02f;
+
+        internal static void Score(CounterPreviewContext preview, ScoreConfigModel settings, MainConfigModel mainConfig)
+        {
+            GameObject holder = CreateHolder(preview);
+            float positionScale = preview.CanvasUtility.GetCanvasSettingsFromID(settings.CanvasID).PositionScale;
+            Position(holder.transform, preview, new Vector3(0, 1.91666f * 3f / positionScale, 0));
+            holder.transform.localScale = Divide(Vector3.one * ScoreUnitScale, holder.transform.parent.lossyScale);
+            FontStyles style = mainConfig.ItalicText ? FontStyles.Italic : FontStyles.Normal;
+
+            TMP_Text points = AddText(preview, holder.transform, "567,890", 15, new Vector2(65, 15), Vector2.zero, true);
+            points.fontStyle = style;
+
+            if (settings.Mode != ScoreMode.RankOnly)
+            {
+                TMP_Text relative = AddText(preview, holder.transform, $"{94.26f.ToString($"F{settings.DecimalPrecision}")}%", 12, new Vector2(65, 12), new Vector2(0, -17.4f), true);
+                relative.color = new Color(1, 1, 1, 0.5f);
+                relative.fontStyle = style;
+            }
+
+            if (settings.Mode != ScoreMode.ScoreOnly)
+            {
+                TMP_Text rank = AddText(preview, holder.transform, "S", 33, new Vector2(65, 40), new Vector2(0, -29.4f), true);
+                rank.color = settings.CustomRankColors ? settings.GetRankColorFromRank(RankModel.Rank.S) : Color.white;
+                rank.fontStyle = style;
+            }
+            holder.SetActive(true);
         }
 
         private static GameObject CreateHudHolder(CounterPreviewContext preview)
@@ -72,11 +100,12 @@ namespace CountersPlus.UI
             return image;
         }
 
-        private static TMP_Text AddText(CounterPreviewContext preview, Transform parent, string value, float fontSize, Vector2 size, Vector2 position)
+        private static TMP_Text AddText(CounterPreviewContext preview, Transform parent, string value, float fontSize, Vector2 size, Vector2 position, bool topPivot = false)
         {
             TMP_Text text = preview.CreateText();
             text.transform.SetParent(parent, false);
-            text.rectTransform.anchorMin = text.rectTransform.anchorMax = text.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            text.rectTransform.anchorMin = text.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
+            text.rectTransform.pivot = new Vector2(0.5f, topPivot ? 1f : 0.5f);
             text.rectTransform.sizeDelta = size;
             text.rectTransform.anchoredPosition = position;
             text.transform.localRotation = Quaternion.identity;
@@ -84,50 +113,6 @@ namespace CountersPlus.UI
             text.fontSize = fontSize;
             text.alignment = TextAlignmentOptions.Center;
             return text;
-        }
-
-        internal static bool TryScore(CounterPreviewContext preview, ScoreConfigModel settings, MainConfigModel mainConfig)
-        {
-            CoreGameHUDController hud = FindHUD();
-            ScoreUIController scoreSource = hud?.GetComponentInChildren<ScoreUIController>(true);
-            TMP_Text pointsSource = scoreSource?._scoreText;
-            if (pointsSource == null || hud.relativeScoreGo == null || hud.immediateRankGo == null) return false;
-
-            GameObject holder = CreateHolder(preview);
-            GameObject pointsObject = CloneGraphics(pointsSource.gameObject, holder.transform);
-            TMP_Text points = pointsObject.GetComponent<TMP_Text>();
-            points.text = "567,890";
-            float positionScale = preview.CanvasUtility.GetCanvasSettingsFromID(settings.CanvasID).PositionScale;
-            Position(points.transform, preview, new Vector3(0, 1.91666f * 3f / positionScale, 0));
-
-            if (settings.Mode != ScoreMode.RankOnly)
-            {
-                GameObject relativeObject = CloneGraphics(hud.relativeScoreGo, points.transform);
-                relativeObject.transform.localPosition = pointsSource.transform.InverseTransformPoint(hud.relativeScoreGo.transform.position);
-                TMP_Text relative = relativeObject.GetComponent<TMP_Text>();
-                if (relative != null)
-                {
-                    relative.text = $"{94.26f.ToString($"F{settings.DecimalPrecision}")}%";
-                    if (!mainConfig.ItalicText) relative.fontStyle = FontStyles.Normal;
-                }
-            }
-
-            if (settings.Mode != ScoreMode.ScoreOnly)
-            {
-                GameObject rankObject = CloneGraphics(hud.immediateRankGo, points.transform);
-                rankObject.transform.localPosition = pointsSource.transform.InverseTransformPoint(hud.immediateRankGo.transform.position);
-                TMP_Text rank = rankObject.GetComponent<TMP_Text>();
-                if (rank != null)
-                {
-                    rank.text = "S";
-                    rank.color = settings.CustomRankColors ? settings.GetRankColorFromRank(RankModel.Rank.S) : Color.white;
-                    if (!mainConfig.ItalicText) rank.fontStyle = FontStyles.Normal;
-                }
-            }
-
-            if (!mainConfig.ItalicText) points.fontStyle = FontStyles.Normal;
-            holder.SetActive(true);
-            return true;
         }
 
         internal static bool TryProgress(CounterPreviewContext preview)

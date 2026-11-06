@@ -27,8 +27,7 @@ namespace CountersPlus.UI
                         Progress(preview, progress);
                     break;
                 case ScoreConfigModel score:
-                    if (!BaseGameCounterPreview.TryScore(preview, score, mainConfig))
-                        Score(preview, score);
+                    BaseGameCounterPreview.Score(preview, score, mainConfig);
                     break;
                 case ComboConfigModel _:
                     BaseGameCounterPreview.Combo(preview, mainConfig);
@@ -109,19 +108,6 @@ namespace CountersPlus.UI
             ring.rectTransform.anchoredPosition = text.rectTransform.anchoredPosition;
             ring.transform.localScale = Vector3.one * 1.175f / 10;
             ring.fillAmount = settings.IncludeRing ? (settings.ProgressTimeLeft ? 0.57f : 0.43f) : 0.43f;
-        }
-
-        private static void Score(CounterPreviewContext preview, ScoreConfigModel settings)
-        {
-            float positionScale = preview.CanvasUtility.GetCanvasSettingsFromID(settings.CanvasID).PositionScale;
-            Text(preview, "567,890", 4, new Vector3(0, 1.91666f * 3f / positionScale, 0));
-            if (settings.Mode != ScoreMode.RankOnly)
-                Text(preview, $"{94.26f.ToString($"F{settings.DecimalPrecision}")}%", 3);
-            if (settings.Mode != ScoreMode.ScoreOnly)
-            {
-                TMP_Text rank = Text(preview, "S", 3, new Vector3(0, 0.4f, 0));
-                rank.color = settings.CustomRankColors ? settings.GetRankColorFromRank(RankModel.Rank.S) : Color.white;
-            }
         }
 
         private static void PersonalBest(CounterPreviewContext preview, PBConfigModel settings, MainConfigModel mainConfig)

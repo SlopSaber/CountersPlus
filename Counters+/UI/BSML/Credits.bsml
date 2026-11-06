@@ -18,6 +18,6 @@
     </vertical>
 
     <!--Main settings-->
-    <vertical id='main-settings' bg='round-rect-panel' pref-width='100' pad-left='3' pad-right='3' pad-top='1' pad-bottom='1' child-expand-height='false'/>
+    <vertical id='main-settings' bg='round-rect-panel' pref-width='100' pad-left='3' pad-right='3' pad-top='1' pad-bottom='1' child-expand-height='false' child-align='UpperCenter'/>
   </vertical>
 </bg>

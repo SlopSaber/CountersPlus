@@ -108,24 +108,9 @@ namespace CountersPlus.UI.FlowCoordinators
                 // Reset menu audio to original state.
                 songPreviewPlayer.CrossfadeToDefault();
 
-                // When not in FPFC, disable the Menu input, and re-enable the Tutorial menu input
-                if (!Environment.GetCommandLineArgs().Any(x => x.Equals("fpfc", StringComparison.OrdinalIgnoreCase)) &&
-                    !Resources.FindObjectsOfTypeAll<FirstPersonFlyingController>().Any(x => x.isActiveAndEnabled))
-                {
-                    vrInputModule.gameObject.SetActive(false);
-
-                    DisableAllNonImportantObjects(tutorial, tutorial, new string[]
-                    {
-                            "EventSystem",
-                            "ControllerLeft",
-                            "ControllerRight"
-                    });
-                }
-                else // If we're in FPFC, just disable everything as usual.
-                {
-                    DisableAllNonImportantObjects(tutorial, tutorial, Array.Empty<string>());
-                    vrInputModule.enabled = true;
-                }
+                // Keep the menu's own pointers (and anything mods attach to them); hide the tutorial's controllers and input.
+                DisableAllNonImportantObjects(tutorial, tutorial, Array.Empty<string>());
+                vrInputModule.enabled = true;
 
                 callback?.Invoke();
             });

@@ -25,7 +25,6 @@ namespace CountersPlus.Counters
             multiplierText = CanvasUtility.CreateTextFromSettings(Settings);
             multiplierText.text = "x1";
             multiplierText.fontSize = 4;
-            multiplierText.fontStyle = FontStyles.Italic;
             multiplierText.alignment = TextAlignmentOptions.Center;
 
             scoreController.multiplierDidChangeEvent += MultiplierDidChange;
