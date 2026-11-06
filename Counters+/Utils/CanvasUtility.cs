@@ -45,6 +45,11 @@ namespace CountersPlus.Utils
                 // Hide base game elements if needed
                 if (!mainConfig.ComboConfig.Enabled) HideBaseGameHUDElement<ComboUIController>(coreGameHUD);
                 if (!mainConfig.MultiplierConfig.Enabled) HideBaseGameHUDElement<ScoreMultiplierUIController>(coreGameHUD);
+                if (mainConfig.HideCounterHolders)
+                {
+                    HideCounterHolder(coreGameHUD, coreGameHUD.GetComponentInChildren<ComboUIController>(true)?.transform);
+                    HideCounterHolder(coreGameHUD, coreGameHUD.GetComponentInChildren<ScoreMultiplierUIController>(true)?.transform);
+                }
 
                 if (mainConfig.HideMultiplayerRank && multiplayerPositionHUD != null)
                 {
@@ -273,6 +278,22 @@ namespace CountersPlus.Utils
             if (gameObject != null && gameObject.activeInHierarchy)
                 RecurseFunctionOverGameObjectTree(gameObject, (child) => child.SetActive(false));
             gameObject.SetActive(false);
+        }
+
+        // The side panel holding a counter also holds the environment's decorative backing;
+        // hide the panel children that carry no text.
+        private static void HideCounterHolder(CoreGameHUDController coreGameHUD, Transform counter)
+        {
+            Transform panel = counter;
+            while (panel != null && panel.parent != coreGameHUD.transform)
+                panel = panel.parent;
+            if (panel == null) return;
+
+            foreach (Transform child in panel)
+            {
+                if (child.GetComponentInChildren<TMP_Text>(true) == null)
+                    child.gameObject.SetActive(false);
+            }
         }
 
         private void RecurseFunctionOverGameObjectTree(GameObject go, System.Action<GameObject> func)

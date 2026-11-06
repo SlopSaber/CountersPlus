@@ -24,6 +24,8 @@ namespace CountersPlus.ConfigModels
         public virtual bool HideCombo { get; set; } = false;
         public virtual bool HideMultiplier { get; set; } = false;
         public virtual bool BaseHudTogglesMigrated { get; set; } = false;
+        [UIValue(nameof(HideCounterHolders))]
+        public virtual bool HideCounterHolders { get; set; } = false;
         [UIValue(nameof(HideMultiplayerRank))]
         public virtual bool HideMultiplayerRank { get; set; } = false;
         [UIValue(nameof(ComboOffset))]
