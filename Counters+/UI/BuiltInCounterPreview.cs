@@ -31,15 +31,10 @@ namespace CountersPlus.UI
                         Score(preview, score);
                     break;
                 case ComboConfigModel _:
-                    if (!BaseGameCounterPreview.TryCombo(preview))
-                        Text(preview, "128", 5);
+                    BaseGameCounterPreview.Combo(preview, mainConfig);
                     break;
                 case MultiplierConfigModel _:
-                    if (!BaseGameCounterPreview.TryMultiplier(preview))
-                    {
-                        TMP_Text multiplier = Text(preview, "x4", 4);
-                        multiplier.fontStyle = FontStyles.Italic;
-                    }
+                    BaseGameCounterPreview.Multiplier(preview);
                     break;
                 case PBConfigModel pb:
                     PersonalBest(preview, pb, mainConfig);

@@ -20,10 +20,10 @@ namespace CountersPlus.ConfigModels
         public string DisplayName => "Main";
         [UIValue(nameof(Enabled))]
         public virtual bool Enabled { get; set; } = true;
-        [UIValue(nameof(HideCombo))]
+        // Superseded by the Combo and Multiplier counters' Enabled settings; read once to migrate older configs.
         public virtual bool HideCombo { get; set; } = false;
-        [UIValue(nameof(HideMultiplier))]
         public virtual bool HideMultiplier { get; set; } = false;
+        public virtual bool BaseHudTogglesMigrated { get; set; } = false;
         [UIValue(nameof(HideMultiplayerRank))]
         public virtual bool HideMultiplayerRank { get; set; } = false;
         [UIValue(nameof(ComboOffset))]

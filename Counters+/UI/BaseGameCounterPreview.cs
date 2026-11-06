@@ -11,42 +11,79 @@ namespace CountersPlus.UI
 {
     internal static class BaseGameCounterPreview
     {
-        internal static bool TryCombo(CounterPreviewContext preview)
-        {
-            CoreGameHUDController hud = FindHUD();
-            ComboUIController source = hud?.GetComponentInChildren<ComboUIController>(true);
-            if (source == null) return false;
+        private const float HudUnitScale = 0.01f;
 
-            GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
-            Position(clone.transform, preview);
-            TMP_Text count = clone.GetComponentsInChildren<TMP_Text>(true)
-                .FirstOrDefault(text => text.name.IndexOf("combo", StringComparison.OrdinalIgnoreCase) >= 0 && int.TryParse(text.text, out _))
-                ?? clone.GetComponentsInChildren<TMP_Text>(true).FirstOrDefault(text => int.TryParse(text.text, out _))
-                ?? clone.GetComponentInChildren<TMP_Text>(true);
-            if (count != null) count.text = "128";
+        internal static void Combo(CounterPreviewContext preview, MainConfigModel mainConfig)
+        {
+            GameObject holder = CreateHudHolder(preview);
+            Sprite line = FindSprite("Rect16");
+            AddImage(holder.transform, "Line0", line, Color.white, new Vector2(100, 6), new Vector2(0, 35), Image.Type.Sliced);
+            AddImage(holder.transform, "Line1", line, Color.white, new Vector2(100, 6), new Vector2(0, -35), Image.Type.Sliced);
+
+            TMP_Text label = AddText(preview, holder.transform, "Combo", 30, new Vector2(120, 30), new Vector2(0, 13));
+            label.fontStyle = FontStyles.UpperCase | (mainConfig.ItalicText ? FontStyles.Italic : FontStyles.Normal);
+            label.transform.localScale = new Vector3(0.7f, 1, 1);
+
+            TMP_Text count = AddText(preview, holder.transform, "128", 40, new Vector2(100, 40), new Vector2(0, -16));
+            count.fontStyle = mainConfig.ItalicText ? FontStyles.Italic : FontStyles.Normal;
             holder.SetActive(true);
-            return true;
         }
 
-        internal static bool TryMultiplier(CounterPreviewContext preview)
+        internal static void Multiplier(CounterPreviewContext preview)
         {
-            CoreGameHUDController hud = FindHUD();
-            ScoreMultiplierUIController source = hud?.GetComponentInChildren<ScoreMultiplierUIController>(true);
-            if (source == null) return false;
-
-            GameObject holder = CreateHolder(preview);
-            GameObject clone = CloneGraphics(source.gameObject, holder.transform);
-            foreach (TMP_Text text in clone.GetComponentsInChildren<TMP_Text>(true))
-                text.enabled = false;
-            Position(clone.transform, preview);
+            GameObject holder = CreateHudHolder(preview);
+            Sprite circle = FindSprite("Circle");
+            AddImage(holder.transform, "BGCircle", circle, new Color(1, 1, 1, 0.25f), new Vector2(100, 100), Vector2.zero, Image.Type.Simple);
+            Image progress = AddImage(holder.transform, "FGCircle", circle, Color.white, new Vector2(100, 100), Vector2.zero, Image.Type.Filled);
+            progress.fillMethod = Image.FillMethod.Radial360;
+            progress.fillOrigin = 2;
+            progress.fillClockwise = true;
+            progress.fillAmount = 0.5f;
             holder.SetActive(true);
 
             TMP_Text multiplier = preview.CreateText();
             multiplier.text = "x4";
             multiplier.fontSize = 4;
             multiplier.fontStyle = FontStyles.Italic;
-            return true;
+        }
+
+        private static GameObject CreateHudHolder(CounterPreviewContext preview)
+        {
+            GameObject holder = CreateHolder(preview);
+            Position(holder.transform, preview);
+            holder.transform.localScale = Divide(Vector3.one * HudUnitScale, holder.transform.parent.lossyScale);
+            return holder;
+        }
+
+        private static Sprite FindSprite(string name) => Resources.FindObjectsOfTypeAll<Sprite>().FirstOrDefault(sprite => sprite.name == name);
+
+        private static Image AddImage(Transform parent, string name, Sprite sprite, Color color, Vector2 size, Vector2 position, Image.Type type)
+        {
+            GameObject gameObject = new GameObject(name, typeof(RectTransform));
+            gameObject.transform.SetParent(parent, false);
+            ImageView image = gameObject.AddComponent<ImageView>();
+            image.material = BeatSaberMarkupLanguage.Utilities.ImageResources.NoGlowMat;
+            image.sprite = sprite;
+            image.type = sprite == null && type == Image.Type.Sliced ? Image.Type.Simple : type;
+            image.color = color;
+            image.raycastTarget = false;
+            image.rectTransform.sizeDelta = size;
+            image.rectTransform.anchoredPosition = position;
+            return image;
+        }
+
+        private static TMP_Text AddText(CounterPreviewContext preview, Transform parent, string value, float fontSize, Vector2 size, Vector2 position)
+        {
+            TMP_Text text = preview.CreateText();
+            text.transform.SetParent(parent, false);
+            text.rectTransform.anchorMin = text.rectTransform.anchorMax = text.rectTransform.pivot = new Vector2(0.5f, 0.5f);
+            text.rectTransform.sizeDelta = size;
+            text.rectTransform.anchoredPosition = position;
+            text.transform.localRotation = Quaternion.identity;
+            text.text = value;
+            text.fontSize = fontSize;
+            text.alignment = TextAlignmentOptions.Center;
+            return text;
         }
 
         internal static bool TryScore(CounterPreviewContext preview, ScoreConfigModel settings, MainConfigModel mainConfig)

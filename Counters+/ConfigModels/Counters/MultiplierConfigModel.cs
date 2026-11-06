@@ -7,9 +7,12 @@ namespace CountersPlus.ConfigModels
         [Ignore]
         public override string DisplayName => "Multiplier";
 
-        public override bool Enabled { get; set; } = false;
+        internal const CounterPositions DefaultPosition = CounterPositions.AboveMultiplier;
+        internal const float DefaultDistance = -1.93f;
+
+        public override bool Enabled { get; set; } = true;
         [UseConverter]
-        public override CounterPositions Position { get; set; } = CounterPositions.AboveMultiplier;
-        public override float Distance { get; set; } = 0;
+        public override CounterPositions Position { get; set; } = DefaultPosition;
+        public override float Distance { get; set; } = DefaultDistance;
     }
 }

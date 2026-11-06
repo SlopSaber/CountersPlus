@@ -43,8 +43,8 @@ namespace CountersPlus.Utils
                 energyCanvas = coreGameHUD.energyPanelGo.GetComponent<Canvas>();
 
                 // Hide base game elements if needed
-                if (mainConfig.HideCombo) HideBaseGameHUDElement<ComboUIController>(coreGameHUD);
-                if (mainConfig.HideMultiplier) HideBaseGameHUDElement<ScoreMultiplierUIController>(coreGameHUD);
+                if (!mainConfig.ComboConfig.Enabled) HideBaseGameHUDElement<ComboUIController>(coreGameHUD);
+                if (!mainConfig.MultiplierConfig.Enabled) HideBaseGameHUDElement<ScoreMultiplierUIController>(coreGameHUD);
 
                 if (mainConfig.HideMultiplayerRank && multiplayerPositionHUD != null)
                 {

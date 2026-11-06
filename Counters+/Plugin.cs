@@ -31,6 +31,7 @@ namespace CountersPlus
             Instance = this;
             Logger = logger;
             MainConfig = conf.Generated<MainConfigModel>();
+            MigrateBaseHudToggles(MainConfig);
             harmony = new HarmonyObj(HARMONY_ID);
 
             zenjector.Expose<CoreGameHUDController>(condition: (context, _) =>
@@ -41,6 +42,28 @@ namespace CountersPlus
 
             zenjector.Install<CountersInstaller>(Location.StandardPlayer | Location.CampaignPlayer);
             zenjector.Install<MultiplayerCountersInstaller, MultiplayerLocalActivePlayerInstaller>();
+        }
+
+        // The combo and multiplier used to stay in place while their counters were disabled, unless hidden separately.
+        // Disabling those counters now hides them, so keep previously visible ones enabled at the base game position.
+        private static void MigrateBaseHudToggles(MainConfigModel config)
+        {
+            if (config.BaseHudTogglesMigrated) return;
+
+            if (!config.ComboConfig.Enabled && !config.HideCombo)
+            {
+                config.ComboConfig.Enabled = true;
+                config.ComboConfig.Position = ComboConfigModel.DefaultPosition;
+                config.ComboConfig.Distance = ComboConfigModel.DefaultDistance;
+            }
+            if (!config.MultiplierConfig.Enabled && !config.HideMultiplier)
+            {
+                config.MultiplierConfig.Enabled = true;
+                config.MultiplierConfig.Position = MultiplierConfigModel.DefaultPosition;
+                config.MultiplierConfig.Distance = MultiplierConfigModel.DefaultDistance;
+            }
+            config.BaseHudTogglesMigrated = true;
+            config.Changed();
         }
 
         [OnEnable]
